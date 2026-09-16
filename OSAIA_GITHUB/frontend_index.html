@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSAIA v2.0 - Arquitectura de Inteligencia Artificial</title>
+    <meta name="description" content="OSAIA - Plataforma de IA completa. Python, C++, CUDA, GLSL, PyTorch, TensorFlow, FFmpeg. Arquitectura técnica profesional.">
+    <meta name="keywords" content="OSAIA, IA, Inteligencia Artificial, Python, C++, CUDA, GLSL, PyTorch, TensorFlow, FFmpeg, Arquitectura">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <div class="logo" onclick="showSection('home')">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 64 64" width="26" height="26" fill="none">
+                        <path d="M32 8C20 8 12 16 12 28c0 8 4 14 10 18v4c0 2 1.5 3 3.5 3h13c2 0 3.5-1 3.5-3v-4c6-4 10-10 10-18 0-12-8-20-20-20z"/>
+                        <path d="M44 36c4 2 8 4 8 10v4l-8-2-8-4v-2c5 0 6-2 8-6z"/>
+                        <circle cx="26" cy="24" r="3" fill="#0a0a1a"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-name">OSAIA</span>
+                    <span class="logo-subtitle">AI Architecture</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu" id="navMenu">
+                <a class="nav-link active" data-section="home" onclick="showSection('home')">
+                    <i class="ri-home-5-line"></i> Inicio
+                </a>
+                <a class="nav-link" data-section="architecture" onclick="showSection('architecture')">
+                    <i class="ri-function-line"></i> Arquitectura
+                </a>
+                <a class="nav-link" data-section="chat" onclick="showSection('chat')">
+                    <i class="ri-chat-3-line"></i> Chat IA
+                </a>
+                <a class="nav-link" data-section="code" onclick="showSection('code')">
+                    <i class="ri-code-s-slash-line"></i> Código
+                </a>
+                <a class="nav-link" data-section="images" onclick="showSection('images')">
+                    <i class="ri-image-line"></i> Imágenes
+                </a>
+                <a class="nav-link" data-section="files" onclick="showSection('files')">
+                    <i class="ri-file-list-3-line"></i> Archivos
+                </a>
+                <a class="nav-link" data-section="voice" onclick="showSection('voice')">
+                    <i class="ri-mic-line"></i> Voz
+                </a>
+                <a class="nav-link" data-section="admin" onclick="showSection('admin')">
+                    <i class="ri-dashboard-line"></i> Admin
+                </a>
+            </nav>
+
+            <div class="header-actions">
+                <button class="btn btn-primary btn-small" onclick="showSection('chat')">
+                    <i class="ri-flashlight-line"></i> Iniciar
+                </button>
+                <button class="mobile-toggle" onclick="toggleMobileMenu()">
+                    <i class="ri-menu-4-line"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MASCOTA QUETZAL ===== -->
+    <div class="quetzal-container" onclick="quetzalSpeak()">
+        <div class="quetzal-wrapper">
+            <div class="quetzal-aura"></div>
+            <div class="quetzal-body">
+                <svg class="quetzal-svg" viewBox="0 0 120 140" fill="none">
+                    <path d="M55 95 Q30 110 15 135" stroke="white" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.9"/>
+                    <path d="M60 95 Q40 115 25 138" stroke="white" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                    <ellipse cx="60" cy="75" rx="30" ry="35" fill="white"/>
+                    <path d="M45 65 Q25 70 20 90 Q35 85 50 80 Z" fill="#e5e5e5"/>
+                    <circle cx="68" cy="45" r="22" fill="white"/>
+                    <path d="M60 25 L58 10 L65 20 L70 8 L72 22 Z" fill="#d4af37"/>
+                    <path d="M55 28 L48 15 L56 25 Z" fill="#b8960c"/>
+                    <path d="M85 42 L100 45 L85 50 Z" fill="#888"/>
+                    <path d="M85 46 L95 47 L85 49 Z" fill="#666"/>
+                    <circle cx="75" cy="42" r="6" fill="#0a0a0a"/>
+                    <circle cx="76" cy="42" r="3.5" fill="white"/>
+                    <circle cx="77" cy="41" r="1.2" fill="#0a0a0a"/>
+                    <ellipse cx="72" cy="58" rx="8" ry="6" fill="#d4d4d4" opacity="0.7"/>
+                    <line x1="50" y1="108" x2="48" y2="120" stroke="#d4af37" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="65" y1="108" x2="67" y2="120" stroke="#d4af37" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="quetzal-badge" title="OSAIA">
+                <i class="ri-message-3-line"></i>
+            </div>
+            <div class="quetzal-speech-bubble" id="quetzalBubble">
+                Soy <strong>OSAIA</strong>. Arquitectura de IA completa: Python → C++ → CUDA → PyTorch → FFmpeg. 🦜
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="main-content">
+
+        <!-- ===== SECCIÓN: INICIO ===== -->
+        <section class="section active" id="home">
+            <div class="hero">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        v2.0 — Arquitectura Técnica Completa
+                    </div>
+                    
+                    <h1 class="hero-title">
+                        <span class="line-1">OSAIA</span>
+                        <span class="line-2">Arquitectura de Inteligencia Artificial de alto rendimiento<br>
+                        <span class="gold-text">Python · C++ · CUDA · GLSL · PyTorch · TensorFlow · FFmpeg</span></span>
+                    </h1>
+                    
+                    <p class="hero-subtitle">
+                        Plataforma integral de IA que orquesta el flujo completo: desde el prompt en lenguaje natural, 
+                        pasando por modelos de difusión en GPU, hasta la codificación final de video. 
+                        Una verdadera arquitectura de IA profesional.
+                    </p>
+                    
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary btn-large" onclick="showSection('architecture')">
+                            <i class="ri-function-line"></i> Ver Arquitectura
+                        </button>
+                        <button class="btn btn-outline btn-large" onclick="showSection('chat')">
+                            <i class="ri-chat-3-line"></i> Probar IA
+                        </button>
+                        <button class="btn btn-gold btn-large" onclick="showSection('code')">
+                            <i class="ri-code-box-line"></i> Generar Código
+                        </button>
+                    </div>
+                    
+                    <div class="hero-specs">
+                        <div class="hero-spec-item">
+                            <span class="hero-spec-value">7+</span>
+                            <span class="hero-spec-label">Capas Técnicas</span>
+                        </div>
+                        <div class="hero-spec-item">
+                            <span class="hero-spec-value">12+</span>
+                            <span class="hero-spec-label">Lenguajes</span>
+                        </div>
+                        <div class="hero-spec-item">
+                            <span class="hero-spec-value">100%</span>
+                            <span class="hero-spec-label">Pipeline Completo</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DIAGRAMA TÉCNICO -->
+                <div class="hero-visual">
+                    <div class="tech-diagram">
+                        <!-- Conexiones SVG -->
+                        <svg class="tech-connections" viewBox="0 0 500 500">
+                            <line x1="250" y1="100" x2="250" y2="220" stroke-dasharray="4,4"/>
+                            <line x1="250" y1="280" x2="250" y2="400" stroke-dasharray="4,4"/>
+                            <line x1="310" y1="220" x2="400" y2="160" stroke-dasharray="4,4"/>
+                            <line x1="310" y1="220" x2="400" y2="320" stroke-dasharray="4,4"/>
+                            <line x1="190" y1="220" x2="100" y2="160" stroke-dasharray="4,4"/>
+                            <line x1="190" y1="220" x2="100" y2="320" stroke-dasharray="4,4"/>
+                            <line x1="310" y1="250" x2="430" y2="250" stroke-dasharray="4,4"/>
+                        </svg>
+                        
+                        <!-- Nodo Central: OSAIA Engine -->
+                        <div class="tech-node core">
+                            <div class="tech-node-icon">⚙️</div>
+                            <strong>OSAIA ENGINE</strong>
+                        </div>
+                        
+                        <!-- Nivel 1: Interfaz -->
+                        <div class="tech-node python">
+                            <div class="tech-node-icon">🐍</div>
+                            <strong>Python</strong>
+                            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Prompt · Control</div>
+                        </div>
+                        
+                        <!-- Nivel 2: Procesamiento -->
+                        <div class="tech-node cpp">
+                            <div class="tech-node-icon">⚡</div>
+                            <strong>C++</strong>
+                            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Frames · Velocidad</div>
+                        </div>
+                        
+                        <div class="tech-node shaders">
+                            <div class="tech-node-icon">🎨</div>
+                            <strong>GLSL / HLSL</strong>
+                            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Shaders · GPU</div>
+                        </div>
+                        
+                        <!-- Nivel 3: GPU / IA -->
+                        <div class="tech-node cuda">
+                            <div class="tech-node-icon">🎮</div>
+                            <strong>CUDA</strong>
+                            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Núcleos GPU</div>
+                        </div>
+                        
+                        <div class="tech-node pytorch">
+                            <div class="tech-node-icon">🔥</div>
+                            <strong>PyTorch</strong>
+                            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Redes Neuronales</div>
+                        </div>
+                        
+                        <div class="tech-node tensorflow" style="display:none;">
+                            <div class="tech-node-icon">🧠</div>
+                            <strong>TensorFlow</strong>
+                        </div>
+                        
+                        <!-- Nivel 4: Salida -->
+                        <div class="tech-node ffmpeg">
+                            <div class="tech-node-icon">🎬</div>
+                            <strong>FFmpeg</strong>
+                            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Códec · Video</div>
+                        </div>
+                        
+                        <div class="tech-node tensorflow" style="top: 45%; right: -8%; position: absolute; background: var(--bg-glass-strong); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 0.8rem 1rem; font-size: 0.8rem; color: var(--text-secondary);">
+                            <div class="tech-node-icon">🧠</div>
+                            <strong>TensorFlow</strong>
+                            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Modelos · TPU</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TARJETAS DE CAPAS TÉCNICAS -->
+            <div class="section-header" style="margin-top: 5rem;">
+                <span class="section-eyebrow">Stack Tecnológico</span>
+                <h2 class="section-title">Las 7 capas de la arquitectura OSAIA</h2>
+                <p class="section-subtitle">Cada capa cumple una función especializada en el pipeline de generación</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🐍</div>
+                    <h3>Python — Orquestación</h3>
+                    <p>Sigue siendo el jefe de la operación. Recibe tu prompt en lenguaje natural, lo interpreta y manda las instrucciones precisas a cada motor del sistema.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">Transformers</span>
+                        <span class="tech-tag">Diffusers</span>
+                        <span class="tech-tag">Gradio</span>
+                        <span class="tech-tag">FastAPI</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>C++ — Motor de Rendimiento</h3>
+                    <p>Procesa los fotogramas de video a toda velocidad. Mueve millones de píxeles por segundo sin congelar la computadora. Es el lenguaje de los motores 3D.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">STL</span>
+                        <span class="tech-tag">OpenCV</span>
+                        <span class="tech-tag">Eigen</span>
+                        <span class="tech-tag">Boost</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎮</div>
+                    <h3>CUDA — Puente a la GPU</h3>
+                    <p>El traductor que habla directo con los chips de la tarjeta gráfica NVIDIA. Desbloquea miles de núcleos para procesar cálculos en paralelo masivo.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">CUDA C++</span>
+                        <span class="tech-tag">cuDNN</span>
+                        <span class="tech-tag">cuBLAS</span>
+                        <span class="tech-tag">NCCL</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>GLSL / HLSL — Shaders</h3>
+                    <p>Lenguajes de sombreado que hablan directamente con la GPU. Calculan cada píxel: luces, reflejos, texturas, color y sombras de tu imagen o video.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">OpenGL</span>
+                        <span class="tech-tag">Vulkan</span>
+                        <span class="tech-tag">DirectX</span>
+                        <span class="tech-tag">Metal</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔥</div>
+                    <h3>PyTorch — Redes Neuronales</h3>
+                    <p>Librerías gigantes escritas para Python. Contienen las "redes neuronales" que ya aprendieron cómo se ve un gato, un coche o el espacio. Hacen el truco de quitar el ruido.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">Torch</span>
+                        <span class="tech-tag">TorchVision</span>
+                        <span class="tech-tag">HuggingFace</span>
+                        <span class="tech-tag">Lightning</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>TensorFlow / Keras</h3>
+                    <p>Otro ecosistema de redes neuronales de Google. Modelos pre-entrenados, optimización para TPU y despliegue en producción a escala empresarial.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">Keras</span>
+                        <span class="tech-tag">TF Lite</span>
+                        <span class="tech-tag">TFX</span>
+                        <span class="tech-tag">Model Garden</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎬</div>
+                    <h3>FFmpeg — Codificación Final</h3>
+                    <p>Herramienta de código oculto en el sistema. Agarra todas las imágenes que la IA dibujó, las une en fila y arma el archivo de video final (.mp4). Lo comprime para que cargue rápido.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">libavcodec</span>
+                        <span class="tech-tag">libavformat</span>
+                        <span class="tech-tag">H.264</span>
+                        <span class="tech-tag">H.265</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>ONNX — Interoperabilidad</h3>
+                    <p>Formato abierto que permite mover modelos entre PyTorch, TensorFlow y otros frameworks. Optimiza la inferencia para diferentes hardware.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">ONNX Runtime</span>
+                        <span class="tech-tag">TensorRT</span>
+                        <span class="tech-tag">OpenVINO</span>
+                        <span class="tech-tag">CoreML</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3>API — Capa de Servicio</h3>
+                    <p>FastAPI / Flask exponiendo endpoints REST. Gestiona colas de trabajo, rate limiting, autenticación y orquesta todo el pipeline de generación.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">FastAPI</span>
+                        <span class="tech-tag">Redis</span>
+                        <span class="tech-tag">Celery</span>
+                        <span class="tech-tag">Docker</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECCIÓN: ARQUITECTURA TÉCNICA ===== -->
+        <section class="section" id="architecture">
+            <div class="architecture-section">
+                <div class="architecture-title">
+                    <span class="section-eyebrow">🔬 Pipeline Técnico</span>
+                    <h2 class="section-title">Cómo funciona OSAIA por dentro</h2>
+                    <p>El viaje completo desde tu texto hasta la imagen o video final</p>
+                </div>
+                
+                <div class="architecture-pipeline">
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-number">01</div>
+                        <div class="pipeline-step-content">
+                            <h4>Tokenización y Embedding</h4>
+                            <p>Tu prompt en lenguaje natural se convierte en tokens numéricos. Cada palabra se transforma en un vector de 768+ dimensiones en el espacio latente del modelo de lenguaje.</p>
+                        </div>
+                        <div class="pipeline-step-tech">
+                            <span>Python</span>
+                            <span>CLIP / T5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-arrow">▼</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-number">02</div>
+                        <div class="pipeline-step-content">
+                            <h4>Modelo de Lenguaje — Dirección del proceso</h4>
+                            <p>Un LLM (Large Language Model) interpreta tu intención, enriquece el prompt con detalles técnicos y genera los parámetros precisos para el modelo de difusión.</p>
+                        </div>
+                        <div class="pipeline-step-tech">
+                            <span>Transformers</span>
+                            <span>Attention</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-arrow">▼</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-number">03</div>
+                        <div class="pipeline-step-content">
+                            <h4>Proceso de Difusión — De ruido a imagen</h4>
+                            <p>Comienza con una imagen de puro ruido aleatorio. En 20 a 50 pasos de "denoising", el modelo va quitando el ruido guiado por el embedding de texto. Cada paso: predicción de ruido → resta → imagen más limpia.</p>
+                        </div>
+                        <div class="pipeline-step-tech">
+                            <span>PyTorch</span>
+                            <span>UNet</span>
+                            <span>Scheduler</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-arrow">▼</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-number">04</div>
+                        <div class="pipeline-step-content">
+                            <h4>Aceleración CUDA — Cómputo en GPU</h4>
+                            <p>Cada operación matricial se paraleliza en miles de núcleos CUDA. Las convoluciones, multiplicaciones de matrices y funciones de activación corren en la GPU a velocidades imposibles para CPU.</p>
+                        </div>
+                        <div class="pipeline-step-tech">
+                            <span>CUDA Kernels</span>
+                            <span>cuDNN</span>
+                            <span>Tensor Cores</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-arrow">▼</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-number">05</div>
+                        <div class="pipeline-step-content">
+                            <h4>Post-procesamiento — Shaders y efectos</h4>
+                            <p>GLSL/HLSL toman el tensor resultante y aplican efectos en el shader: corrección de color, profundidad de campo, motion blur, upscaling (ESRGAN/Real-ESRGAN) para mayor resolución.</p>
+                        </div>
+                        <div class="pipeline-step-tech">
+                            <span>GLSL</span>
+                            <span>Vulkan</span>
+                            <span>Upscaler</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-arrow">▼</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-number">06</div>
+                        <div class="pipeline-step-content">
+                            <h4>Decodificación VAE — Latente → Espacio píxel</h4>
+                            <p>El Decoder del VAE (Variational Autoencoder) toma la representación latente comprimida y la expande al espacio de píxeles completo (512×512, 768×768, 1024×1024...).</p>
+                        </div>
+                        <div class="pipeline-step-tech">
+                            <span>VAE Decoder</span>
+                            <span>float32→uint8</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-arrow">▼</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-number">07</div>
+                        <div class="pipeline-step-content">
+                            <h4>C++ / FFmpeg — Codificación de video</h4>
+                            <p>Si el output es video: C++ gestiona el buffer de fotogramas en memoria. FFmpeg toma cada frame PNG, lo codifica con H.264/H.265, empaqueta en .mp4, aplica compresión eficiente.</p>
+                        </div>
+                        <div class="pipeline-step-tech">
+                            <span>C++ STL</span>
+                            <span>FFmpeg</span>
+                            <span>libx264</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-arrow">▼</div>
+                    
+                    <div class="pipeline-step">
+                        <div class="pipeline-step-number">08</div>
+                        <div class="pipeline-step-content">
+                            <h4>Entrega al usuario</h4>
+                            <p>El archivo final se sirve a través de la API. Bytes optimizados, lista para descargar o reproducir en streaming. Todo el pipeline completado en segundos.</p>
+                        </div>
+                        <div class="pipeline-step-tech">
+                            <span>FastAPI</span>
+                            <span>CDN</span>
+                            <span>Streaming</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DETALLES TÉCNICOS ADICIONALES -->
+            <div class="section-header" style="margin-top: 5rem;">
+                <span class="section-eyebrow">📐 Especificaciones</span>
+                <h2 class="section-title">Capacidades técnicas del sistema</h2>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧮</div>
+                    <h3>Resolución de Imagen</h3>
+                    <p>Desde 512×512 hasta 4K mediante upscaling neural. Control preciso de aspect ratio: 1:1, 16:9, 9:16, 4:3, 3:2.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">512²</span>
+                        <span class="tech-tag">768²</span>
+                        <span class="tech-tag">1024²</span>
+                        <span class="tech-tag">4K</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎞️</div>
+                    <h3>Generación de Video</h3>
+                    <p>Hasta 30 FPS, duración configurable de 2 a 30 segundos. Codecs: H.264, H.265, VP9. Interpolación de frames para fluidez.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">24-60 FPS</span>
+                        <span class="tech-tag">H.264</span>
+                        <span class="tech-tag">H.265</span>
+                        <span class="tech-tag">MP4</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>Control de Generación</h3>
+                    <p>CFG Scale (7-15), Steps (20-50), Sampler (Euler, DPM++, DDIM), Seed reproducible, ControlNet para pose/profundidad.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">CFG</span>
+                        <span class="tech-tag">Samplers</span>
+                        <span class="tech-tag">Seed</span>
+                        <span class="tech-tag">LoRA</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Modelos Soportados</h3>
+                    <p>Stable Diffusion XL, SD 1.5, ControlNet, LoRA adapters, DreamBooth fine-tunes, Textual Inversions personalizados.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">SDXL</span>
+                        <span class="tech-tag">SD 1.5</span>
+                        <span class="tech-tag">ControlNet</span>
+                        <span class="tech-tag">LoRA</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💻</div>
+                    <h3>Requisitos Hardware</h3>
+                    <p>GPU NVIDIA con 8GB+ VRAM (recomendado 16GB+). Soporte multi-GPU. Inferencia CPU posible pero más lenta.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">NVIDIA GPU</span>
+                        <span class="tech-tag">8GB+ VRAM</span>
+                        <span class="tech-tag">CUDA 11.8+</span>
+                        <span class="tech-tag">16GB RAM</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🐳</div>
+                    <h3>Despliegue</h3>
+                    <p>Contenedores Docker listos para producción. Orquestación Kubernetes. Auto-scaling basado en longitud de cola de trabajos.</p>
+                    <div class="feature-tech-stack">
+                        <span class="tech-tag">Docker</span>
+                        <span class="tech-tag">K8s</span>
+                        <span class="tech-tag">Helm</span>
+                        <span class="tech-tag">S3</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECCIÓN: CHAT IA ===== -->
+        <section class="section" id="chat">
+            <div class="chat-main-container">
+                <aside class="chat-sidebar">
+                    <button class="new-chat-btn" onclick="newChat()">
+                        <i class="ri-add-line"></i> Nueva Conversación
+                    </button>
+                    
+                    <div class="chat-modes">
+                        <div class="chat-mode-title">Modos de IA</div>
+                        
+                        <button class="chat-mode-btn active" data-mode="chat" onclick="setChatMode('chat')">
+                            <i class="ri-chat-3-line"></i> Conversación
+                        </button>
+                        <button class="chat-mode-btn" data-mode="code" onclick="setChatMode('code')">
+                            <i class="ri-code-s-slash-line"></i> Programador
+                        </button>
+                        <button class="chat-mode-btn" data-mode="translate" onclick="setChatMode('translate')">
+                            <i class="ri-translate"></i> Traductor
+                        </button>
+                        <button class="chat-mode-btn" data-mode="writer" onclick="setChatMode('writer')">
+                            <i class="ri-quill-pen-line"></i> Redactor
+                        </button>
+                        <button class="chat-mode-btn" data-mode="math" onclick="setChatMode('math')">
+                            <i class="ri-calculator-line"></i> Matemáticas
+                        </button>
+                        <button class="chat-mode-btn" data-mode="analyst" onclick="setChatMode('analyst')">
+                            <i class="ri-line-chart-line"></i> Analista
+                        </button>
+                        <button class="chat-mode-btn" data-mode="architect" onclick="setChatMode('architect')">
+                            <i class="ri-function-line"></i> Arquitecto IA
+                        </button>
+                    </div>
+                    
+                    <div class="chat-mode-title" style="margin-top: 1rem;">Historial</div>
+                    <div class="chat-history" id="chatHistory">
+                        <div class="chat-history-item" onclick="loadChat(0)">
+                            <i class="ri-message-3-line" style="margin-right:6px;"></i>
+                            Bienvenida a OSAIA
+                        </div>
+                    </div>
+                </aside>
+                
+                <div class="chat-area">
+                    <div class="chat-area-header">
+                        <div class="chat-area-info">
+                            <div class="chat-mode-icon" id="chatModeIcon">
+                                <i class="ri-chat-3-line"></i>
+                            </div>
+                            <div>
+                                <div class="chat-mode-name" id="chatModeName">Conversación General</div>
+                                <div class="chat-mode-desc" id="chatModeDesc">OSAIA responderá de manera natural y versátil</div>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button class="chat-action-btn" title="Hablar" onclick="toggleVoice()">
+                                <i class="ri-volume-up-line" id="voiceIcon"></i>
+                            </button>
+                            <button class="chat-action-btn" title="Exportar" onclick="exportChat()">
+                                <i class="ri-download-line"></i>
+                            </button>
+                            <button class="chat-action-btn" title="Limpiar" onclick="clearChat()">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages-container" id="chatMessages">
+                        <div class="message-wrapper assistant">
+                            <div class="message-avatar">
+                                <svg viewBox="0 0 64 64" width="22" height="22" fill="none">
+                                    <path d="M32 8C20 8 12 16 12 28c0 8 4 14 10 18v4c0 2 1.5 3 3.5 3h13c2 0 3.5-1 3.5-3v-4c6-4 10-10 10-18 0-12-8-20-20-20z" fill="white"/>
+                                    <circle cx="26" cy="24" r="3" fill="#0a0a1a"/>
+                                </svg>
+                            </div>
+                            <div class="message-content-wrapper">
+                                <div class="message-sender">OSAIA 🦜</div>
+                                <div class="message-bubble">
+                                    Bienvenido a <strong>OSAIA v2.0</strong> — Arquitectura de Inteligencia Artificial completa. 🦜<br><br>
+                                    Soy una IA que entiende todo el stack técnico: <strong>Python</strong> para orquestar, <strong>C++</strong> para procesamiento rápido, <strong>CUDA</strong> para hablar con la GPU, <strong>GLSL/HLSL</strong> para shaders, <strong>PyTorch/TensorFlow</strong> para las redes neuronales, y <strong>FFmpeg</strong> para codificar el video final.<br><br>
+                                    Puedo:<br>
+                                    • 💬 Conversar sobre cualquier tema técnico<br>
+                                    • 💻 Generar código en 12+ lenguajes<br>
+                                    • 🎨 Explicar el proceso de difusión<br>
+                                    • 🎬 Detallar cómo FFmpeg arma el video<br>
+                                    • 🔬 Describir la arquitectura de modelos<br><br>
+                                    <em>¿Por dónde quieres empezar hoy?</em>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-area">
+                        <div class="chat-input-wrapper">
+                            <div class="chat-input-tools">
+                                <button class="chat-tool-btn" title="Adjuntar" onclick="showNotification('📎 Función próximamente')">
+                                    <i class="ri-attachment-2"></i>
+                                </button>
+                                <button class="chat-tool-btn" title="Emoji" onclick="insertEmoji()">
+                                    <i class="ri-emotion-line"></i>
+                                </button>
+                            </div>
+                            <div class="chat-input-main">
+                                <textarea 
+                                    class="chat-input" 
+                                    id="chatInput" 
+                                    placeholder="Pregúntame a OSAIA... (Enter para enviar, Shift+Enter para nueva línea)"
+                                    rows="1"
+                                    onkeydown="handleChatKeydown(event)"
+                                    oninput="autoResizeTextarea(this)"
+                                ></textarea>
+                                <div class="chat-input-hint">
+                                    <span class="hint-chip" onclick="useHint('Explícame el proceso de difusión paso a paso')">¿Cómo funciona la difusión?</span>
+                                    <span class="hint-chip" onclick="useHint('Genera código CUDA para suma de vectores')">CUDA vector add</span>
+                                    <span class="hint-chip" onclick="useHint('¿Qué rol cumple FFmpeg en el pipeline?')">Rol de FFmpeg</span>
+                                    <span class="hint-chip" onclick="useHint('Dame un ejemplo de shader GLSL')">Shader GLSL</span>
+                                </div>
+                            </div>
+                            <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">
+                                <i class="ri-send-plane-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECCIÓN: CÓDIGO ===== -->
+        <section class="section" id="code">
+            <div class="section-header">
+                <span class="section-eyebrow">💻 Generador Multi-Lenguaje</span>
+                <h2 class="section-title">Código profesional en cualquier tecnología</h2>
+                <p class="section-subtitle">Desde Python de alto nivel hasta kernels CUDA de bajo nivel y shaders GLSL</p>
+            </div>
+            
+            <div class="code-generator-container">
+                <div class="code-config-panel">
+                    <h3 class="panel-title">
+                        <i class="ri-settings-4-line"></i> Configuración
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">🎯 Stack Tecnológico</label>
+                        <div class="language-grid" id="languageGrid">
+                            <div class="lang-option selected" data-lang="python" onclick="selectLanguage(this, 'python')">
+                                <i class="ri-file-code-line"></i> Python
+                            </div>
+                            <div class="lang-option" data-lang="cpp" onclick="selectLanguage(this, 'cpp')">
+                                <i class="ri-braces-line"></i> C++
+                            </div>
+                            <div class="lang-option" data-lang="cuda" onclick="selectLanguage(this, 'cuda')">
+                                <i class="ri-gamepad-line"></i> CUDA
+                            </div>
+                            <div class="lang-option" data-lang="glsl" onclick="selectLanguage(this, 'glsl')">
+                                <i class="ri-shape-line"></i> GLSL
+                            </div>
+                            <div class="lang-option" data-lang="javascript" onclick="selectLanguage(this, 'javascript')">
+                                <i class="ri-javascript-line"></i> JavaScript
+                            </div>
+                            <div class="lang-option" data-lang="typescript" onclick="selectLanguage(this, 'typescript')">
+                                <i class="ri-code-box-line"></i> TypeScript
+                            </div>
+                            <div class="lang-option" data-lang="java" onclick="selectLanguage(this, 'java')">
+                                <i class="ri-code-s-slash-line"></i> Java
+                            </div>
+                            <div class="lang-option" data-lang="csharp" onclick="selectLanguage(this, 'csharp')">
+                                <i class="ri-shape-line"></i> C#
+                            </div>
+                            <div class="lang-option" data-lang="go" onclick="selectLanguage(this, 'go')">
+                                <i class="ri-speed-line"></i> Go
+                            </div>
+                            <div class="lang-option" data-lang="rust" onclick="selectLanguage(this, 'rust')">
+                                <i class="ri-fire-line"></i> Rust
+                            </div>
+                            <div class="lang-option" data-lang="sql" onclick="selectLanguage(this, 'sql')">
+                                <i class="ri-database-2-line"></i> SQL
+                            </div>
+                            <div class="lang-option" data-lang="pytorch" onclick="selectLanguage(this, 'pytorch')">
+                                <i class="ri-fire-fill"></i> PyTorch
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">📝 ¿Qué quieres crear?</label>
+                        <textarea 
+                            class="form-textarea" 
+                            id="codePrompt" 
+                            placeholder="Describe detalladamente... Ej: Kernel CUDA para suma de dos vectores grandes"
+                            rows="4"
+                        >Kernel CUDA que realice la suma de dos vectores grandes de números flotantes en paralelo en la GPU, con manejo de errores y verificación de resultado en CPU</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">⚙️ Complejidad</label>
+                        <select class="form-select" id="codeComplexity">
+                            <option value="basic">Básica - Simple y directa</option>
+                            <option value="standard" selected>Estándar - Buenas prácticas</option>
+                            <option value="advanced">Avanzada - Optimizada y robusta</option>
+                            <option value="production">Producción - Completa con tests</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">🎨 Incluir comentarios</label>
+                        <select class="form-select" id="codeComments">
+                            <option value="yes" selected>Sí, comentarios explicativos</option>
+                            <option value="minimal">Solo comentarios mínimos</option>
+                            <option value="no">Sin comentarios</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-large" style="width: 100%; margin-top: 1rem;" onclick="generateCode()">
+                        <i class="ri-magic-line"></i>✨ Generar Código
+                    </button>
+                </div>
+                
+                <div class="code-output-panel">
+                    <div class="code-output-header">
+                        <div>
+                            <span style="font-weight: 600; color: var(--text-primary);">📄 Código Generado</span>
+                            <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: 0.5rem;" id="codeLangLabel">Python</span>
+                        </div>
+                        <div class="code-output-actions">
+                            <button class="btn btn-outline btn-small" onclick="copyCode()">
+                                <i class="ri-file-copy-line"></i> Copiar
+                            </button>
+                            <button class="btn btn-gold btn-small" onclick="downloadCode()">
+                                <i class="ri-download-line"></i> Descargar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="code-display">
+                        <pre id="codeOutput"><code># Selecciona las opciones y haz clic en "Generar Código"
+# OSAIA generará código profesional adaptado al stack seleccionado
+# 
+# Stack disponible:
+#   • Python       - Orquestación, modelos, control
+#   • C++          - Procesamiento de alto rendimiento
+#   • CUDA         - Kernels para GPU NVIDIA
+#   • GLSL         - Shaders y procesamiento gráfico
+#   • PyTorch      - Redes neuronales y difusión
+#   • TensorFlow   - Modelos de producción
+#   • FFmpeg       - Codificación de audio/video
+#   • Y muchos más...</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECCIÓN: IMÁGENES ===== -->
+        <section class="section" id="images">
+            <div class="section-header">
+                <span class="section-eyebrow">🎨 Generador de Imágenes</span>
+                <h2 class="section-title">Del texto a la imagen mediante difusión</h2>
+                <p class="section-subtitle">Describe tu visión. OSAIA orquesta todo el pipeline: CLIP → UNet → VAE Decoder → Salida final</p>
+            </div>
+            
+            <div class="image-generator-container">
+                <div class="image-config-panel">
+                    <h3 class="panel-title">
+                        <i class="ri-palette-line"></i> Parámetros de Generación
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">✏️ Prompt (Texto)</label>
+                        <textarea 
+                            class="form-textarea" 
+                            id="imagePrompt" 
+                            rows="4"
+                            placeholder="Describe la imagen que quieres generar..."
+                        >Un majestuoso quetzal volando sobre un bosque nuboso guatemalteco al amanecer, luz dorada filtrándose entre las hojas, plumas iridiscentes, fotografía de naturaleza, alta calidad, 8k, detalle extremo</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">🚫 Negative Prompt (Evitar)</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="imageNegative" 
+                            placeholder="Elementos que quieres excluir..."
+                            value="borroso, baja calidad, distorsionado, deformado, ruido excesivo"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">🎨 Estilo Artístico</label>
+                        <div class="style-grid" id="styleGrid">
+                            <div class="style-option selected" data-style="realistic" onclick="selectStyle(this)">
+                                <i class="ri-camera-line"></i><br>Fotorrealista
+                            </div>
+                            <div class="style-option" data-style="cinematic" onclick="selectStyle(this)">
+                                <i class="ri-film-line"></i><br>Cinemático
+                            </div>
+                            <div class="style-option" data-style="anime" onclick="selectStyle(this)">
+                                <i class="ri-artboard-line"></i><br>Anime
+                            </div>
+                            <div class="style-option" data-style="digital" onclick="selectStyle(this)">
+                                <i class="ri-paint-brush-line"></i><br>Digital Art
+                            </div>
+                            <div class="style-option" data-style="3d" onclick="selectStyle(this)">
+                                <i class="ri-box-3-line"></i><br>3D Render
+                            </div>
+                            <div class="style-option" data-style="noir" onclick="selectStyle(this)">
+                                <i class="ri-contrast-2-line"></i><br>Noir/B&N
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">📐 Resolución</label>
+                        <div class="size-options">
+                            <button class="size-btn active" onclick="selectSize(this, '512')">512²</button>
+                            <button class="size-btn" onclick="selectSize(this, '768')">768²</button>
+                            <button class="size-btn" onclick="selectSize(this, '1024')">1024²</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">⚙️ Pasos de Difusión: <span id="stepsValue">30</span></label>
+                        <input type="range" class="range-slider" id="diffusionSteps" min="10" max="60" value="30" oninput="document.getElementById('stepsValue').textContent=this.value">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">🎯 CFG Scale: <span id="cfgValue">7.5</span></label>
+                        <input type="range" class="range-slider" id="cfgScale" min="1" max="20" step="0.5" value="7.5" oninput="document.getElementById('cfgValue').textContent=this.value">
+                    </div>
+                    
+                    <button class="btn btn-primary btn-large" style="width: 100%; margin-top: 1rem;" onclick="generateImage()">
+                        <i class="ri-magic-line"></i>✨ Generar
+                    </button>
+                </div>
+                
+                <div class="image-gallery" id="imageGallery">
+                    <div class="gallery-empty">
+                        <i class="ri-image-add-line"></i>
+                        <p>Tus imágenes generadas aparecerán aquí</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Describe tu visión y haz clic en generar</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECCIÓN: ARCHIVOS ===== -->
+        <section class="section" id="files">
+            <div class="section-header">
+                <span class="section-eyebrow">📊 Generador de Archivos</span>
+                <h2 class="section-title">Datos estructurados y documentación</h2>
+                <p class="section-subtitle">CSV para Excel, JSON, HTML para Word, SQL, XML, Markdown. Listos para descargar.</p>
+            </div>
+            
+            <div class="file-generator-container">
+                <div class="file-config-panel">
+                    <h3 class="panel-title">
+                        <i class="ri-file-settings-line"></i> Tipo de Archivo
+                    </h3>
+                    
+                    <div class="file-types-grid" id="fileTypesGrid">
+                        <div class="file-type-card selected" data-type="csv" onclick="selectFileType(this, 'csv')">
+                            <div class="file-type-icon">📊</div>
+                            <div class="file-type-name">Excel / CSV</div>
+                            <div class="file-type-ext">.csv</div>
+                        </div>
+                        <div class="file-type-card" data-type="json" onclick="selectFileType(this, 'json')">
+                            <div class="file-type-icon">📋</div>
+                            <div class="file-type-name">JSON</div>
+                            <div class="file-type-ext">.json</div>
+                        </div>
+                        <div class="file-type-card" data-type="html" onclick="selectFileType(this, 'html')">
+                            <div class="file-type-icon">📝</div>
+                            <div class="file-type-name">Word / HTML</div>
+                            <div class="file-type-ext">.html</div>
+                        </div>
+                        <div class="file-type-card" data-type="sql" onclick="selectFileType(this, 'sql')">
+                            <div class="file-type-icon">🗄️</div>
+                            <div class="file-type-name">SQL Script</div>
+                            <div class="file-type-ext">.sql</div>
+                        </div>
+                        <div class="file-type-card" data-type="xml" onclick="selectFileType(this, 'xml')">
+                            <div class="file-type-icon">📄</div>
+                            <div class="file-type-name">XML Datos</div>
+                            <div class="file-type-ext">.xml</div>
+                        </div>
+                        <div class="file-type-card" data-type="markdown" onclick="selectFileType(this, 'markdown')">
+                            <div class="file-type-icon">📑</div>
+                            <div class="file-type-name">Markdown</div>
+                            <div class="file-type-ext">.md</div>
+                        </div>
+                    </div>
+                    
+                    <div id="fileConfigArea">
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label class="form-label">📋 Nombre del archivo</label>
+                            <input type="text" class="form-input" id="fileName" value="datos_osaia" placeholder="Nombre del archivo">
+                        </div>
+                        
+                        <div class="form-group" id="csvConfig">
+                            <label class="form-label">📊 Datos (CSV)</label>
+                            <textarea 
+                                class="form-textarea" 
+                                id="csvData" 
+                                rows="6"
+                                placeholder="Datos separados por coma..."
+                            >id,nombre,edad,ciudad,salario,departamento
+1,Ana García,28,Guatemala,45000,Ingeniería
+2,Carlos Pérez,35,México DF,52000,Diseño
+3,María López,42,Bogotá,48000,Análisis
+4,Juan Rodríguez,31,San José,55000,Backend
+5,Laura Martínez,27,Panamá,42000,Frontend
+6,Pedro Sánchez,38,Quito,58000,DevOps
+7,Isabel Gómez,29,Tegucigalpa,46000,QA
+8,Ricardo Hernández,45,Managua,62000,Arquitectura</textarea>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-large" style="width: 100%; margin-top: 1.5rem;" onclick="generateFile()">
+                        <i class="ri-file-add-line"></i>📥 Generar y Descargar
+                    </button>
+                </div>
+                
+                <div class="file-preview-area">
+                    <div class="file-preview-header">
+                        <div>
+                            <span style="font-weight: 600; color: var(--text-primary);">👁️ Vista Previa</span>
+                            <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: 0.5rem;" id="fileTypeLabel">Excel / CSV</span>
+                        </div>
+                        <button class="btn btn-outline btn-small" onclick="copyFileContent()">
+                            <i class="ri-file-copy-line"></i> Copiar
+                        </button>
+                    </div>
+                    <div class="file-preview-content" id="filePreviewContent">
+                        <div class="excel-preview">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>id</th>
+                                        <th>nombre</th>
+                                        <th>edad</th>
+                                        <th>ciudad</th>
+                                        <th>salario</th>
+                                        <th>departamento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>1</td><td>Ana García</td><td>28</td><td>Guatemala</td><td>45000</td><td>Ingeniería</td></tr>
+                                    <tr><td>2</td><td>Carlos Pérez</td><td>35</td><td>México DF</td><td>52000</td><td>Diseño</td></tr>
+                                    <tr><td>3</td><td>María López</td><td>42</td><td>Bogotá</td><td>48000</td><td>Análisis</td></tr>
+                                    <tr><td>4</td><td>Juan Rodríguez</td><td>31</td><td>San José</td><td>55000</td><td>Backend</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECCIÓN: VOZ ===== -->
+        <section class="section" id="voice">
+            <div class="section-header">
+                <span class="section-eyebrow">🎤 Síntesis y Reconocimiento</span>
+                <h2 class="section-title">Texto a Voz y Voz a Texto</h2>
+                <p class="section-subtitle">Web Speech API. Habla con OSAIA o escucha sus respuestas en audio natural.</p>
+            </div>
+            
+            <div class="voice-container">
+                <div class="voice-panel">
+                    <h3 class="panel-title" style="margin-bottom: 1.5rem;">
+                        <i class="ri-volume-up-line"></i>🔊 Texto a Voz (TTS)
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">📝 Texto para sintetizar</label>
+                        <textarea 
+                            class="form-textarea" 
+                            id="ttsText" 
+                            rows="5"
+                            placeholder="Escribe el texto que quieres que OSAIA lea..."
+                        >Soy OSAIA, una arquitectura de inteligencia artificial completa. Mi pipeline técnico abarca desde Python en la capa de orquestación, pasando por C++ para procesamiento de alto rendimiento, CUDA para aceleración GPU, shaders GLSL para procesamiento visual, redes neuronales en PyTorch y TensorFlow, hasta FFmpeg para la codificación final de video. Soy capaz de entender y generar en múltiples niveles de abstracción tecnológica.</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">🗣️ Seleccionar voz</label>
+                        <select class="form-select" id="voiceSelect">
+                            <option value="">Cargando voces disponibles...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">⚡ Velocidad: <span id="rateValue">1.0</span>x</label>
+                        <input type="range" class="range-slider" id="voiceRate" min="0.5" max="2" step="0.1" value="1" oninput="updateRateValue()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">📈 Tono: <span id="pitchValue">1.0</span></label>
+                        <input type="range" class="range-slider" id="voicePitch" min="0.5" max="2" step="0.1" value="1" oninput="updatePitchValue()">
+                    </div>
+                    
+                    <div class="voice-controls">
+                        <button class="voice-btn play" id="speakBtn" onclick="speakText()" title="Reproducir">
+                            <i class="ri-play-fill"></i>
+                        </button>
+                        <button class="voice-btn" style="background: var(--accent-graphite);" onclick="pauseSpeech()" title="Pausar">
+                            <i class="ri-pause-fill"></i>
+                        </button>
+                        <button class="voice-btn download" onclick="stopSpeech()" title="Detener">
+                            <i class="ri-stop-fill"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="voice-visualizer" id="voiceVisualizer1">
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                    </div>
+                </div>
+                
+                <div class="voice-panel">
+                    <h3 class="panel-title" style="margin-bottom: 1.5rem;">
+                        <i class="ri-mic-line"></i>🎙️ Reconocimiento de Voz (STT)
+                    </h3>
+                    
+                    <div style="text-align: center; padding: 2rem 0;">
+                        <button class="voice-btn record" id="recordBtn" onclick="toggleRecording()" title="Grabar">
+                            <i class="ri-mic-fill"></i>
+                        </button>
+                        <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;" id="recordStatus">
+                            Haz clic para comenzar a grabar
+                        </p>
+                    </div>
+                    
+                    <div class="voice-visualizer" id="voiceVisualizer2" style="background: rgba(255,255,255,0.01);">
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar"></div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 1.5rem;">
+                        <label class="form-label">📝 Transcripción</label>
+                        <textarea 
+                            class="form-textarea" 
+                            id="transcriptText" 
+                            rows="5"
+                            placeholder="Tu voz transcrita aparecerá aquí..."
+                            readonly
+                        ></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.8rem;">
+                        <button class="btn btn-outline" style="flex: 1;" onclick="copyTranscript()">
+                            <i class="ri-file-copy-line"></i> Copiar
+                        </button>
+                        <button class="btn btn-primary" style="flex: 1;" onclick="sendTranscriptToChat()">
+                            <i class="ri-send-plane-line"></i> Enviar al chat
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SECCIÓN: ADMIN ===== -->
+        <section class="section" id="admin">
+            <div class="section-header">
+                <span class="section-eyebrow">📊 Panel de Control</span>
+                <h2 class="section-title">Métricas y Monitoreo del Sistema</h2>
+                <p class="section-subtitle">Rendimiento del pipeline, uso de recursos y estadísticas operativas</p>
+            </div>
+            
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">
+                        <i class="ri-user-line"></i>
+                    </div>
+                    <div>
+                        <div class="admin-stat-value" id="statUsers">1,247</div>
+                        <div class="admin-stat-label">Usuarios Activos</div>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">
+                        <i class="ri-chat-3-line"></i>
+                    </div>
+                    <div>
+                        <div class="admin-stat-value" id="statMessages">28,543</div>
+                        <div class="admin-stat-label">Prompts Procesados</div>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">
+                        <i class="ri-image-line"></i>
+                    </div>
+                    <div>
+                        <div class="admin-stat-value" id="statImages">3,892</div>
+                        <div class="admin-stat-label">Imágenes Generadas</div>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">
+                        <i class="ri-code-s-slash-line"></i>
+                    </div>
+                    <div>
+                        <div class="admin-stat-value" id="statCodes">5,621</div>
+                        <div class="admin-stat-label">Scripts Generados</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="admin-charts-row">
+                <div class="chart-container">
+                    <h4><i class="ri-line-chart-line"></i> Actividad de la Última Semana</h4>
+                    <canvas id="activityChart" height="120"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4><i class="ri-pie-chart-line"></i> Uso por Módulo</h4>
+                    <canvas id="moduleChart" height="120"></canvas>
+                </div>
+            </div>
+            
+            <div class="admin-charts-row">
+                <div class="chart-container">
+                    <h4><i class="ri-code-box-line"></i> Tecnologías / Lenguajes más Solicitados</h4>
+                    <canvas id="languagesChart" height="120"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4><i class="ri-time-line"></i> Latencia de Respuesta Promedio (seg)</h4>
+                    <canvas id="responseChart" height="120"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container" style="margin-top: 1.5rem;">
+                <h4><i class="ri-list-check-2"></i> Log de Actividad Reciente del Sistema</h4>
+                <div style="overflow-x: auto; margin-top: 1rem;">
+                    <table class="excel-preview" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Componente</th>
+                                <th>Operación</th>
+                                <th>Duración</th>
+                                <th>GPU Mem</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>14:32:15.423</td><td>Python → FastAPI</td><td>POST /api/generate</td><td>0.012s</td><td>—</td><td style="color: var(--text-primary);">✓ Recibido</td></tr>
+                            <tr><td>14:32:15.451</td><td>Tokenizer CLIP</td><td>Prompt embedding</td><td>0.089s</td><td>1.2 GB</td><td style="color: var(--text-primary);">✓ OK</td></tr>
+                            <tr><td>14:32:15.583</td><td>PyTorch + CUDA</td><td>Denoising 30 steps</td><td>2.341s</td><td>6.8 GB</td><td style="color: var(--text-primary);">✓ OK</td></tr>
+                            <tr><td>14:32:17.952</td><td>VAE Decoder</td><td>Latente → 768² px</td><td>0.412s</td><td>4.5 GB</td><td style="color: var(--text-primary);">✓ OK</td></tr>
+                            <tr><td>14:32:18.401</td><td>GLSL Upscaler</td><td>ESRGAN ×2</td><td>0.876s</td><td>5.2 GB</td><td style="color: var(--text-primary);">✓ OK</td></tr>
+                            <tr><td>14:32:19.312</td><td>C++ / FFmpeg</td><td>Encode PNG → WebP</td><td>0.058s</td><td>—</td><td style="color: var(--text-primary);">✓ Entregado</td></tr>
+                            <tr><td>14:32:19.380</td><td>OSAIA Engine</td><td>Job #84721 completado</td><td>Total: 3.957s</td><td>Peak: 7.1 GB</td><td style="color: #d4af37;">🏆 Éxito</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 64 64" width="24" height="24" fill="none">
+                            <path d="M32 8C20 8 12 16 12 28c0 8 4 14 10 18v4c0 2 1.5 3 3.5 3h13c2 0 3.5-1 3.5-3v-4c6-4 10-10 10-18 0-12-8-20-20-20z" fill="white"/>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-name">OSAIA</span>
+                        <span class="logo-subtitle">AI Architecture</span>
+                    </div>
+                </div>
+                <p>OSAIA es una arquitectura completa de inteligencia artificial que orquesta todo el pipeline: desde la interpretación del prompt en lenguaje natural hasta la codificación final de video. Python, C++, CUDA, GLSL, PyTorch, TensorFlow y FFmpeg trabajando en sinfonía.</p>
+                <div class="social-links">
+                    <a href="#" title="GitHub"><i class="ri-github-fill"></i></a>
+                    <a href="#" title="ArXiv"><i class="ri-book-open-fill"></i></a>
+                    <a href="#" title="LinkedIn"><i class="ri-linkedin-box-fill"></i></a>
+                    <a href="#" title="HuggingFace"><i class="ri-brain-fill"></i></a>
+                    <a href="#" title="Docker"><i class="ri-container-fill"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Arquitectura</h4>
+                <ul>
+                    <li><a onclick="showSection('architecture')">Pipeline Técnico</a></li>
+                    <li><a href="#">Python Layer</a></li>
+                    <li><a href="#">C++ / CUDA</a></li>
+                    <li><a href="#">GLSL Shaders</a></li>
+                    <li><a href="#">PyTorch / TF</a></li>
+                    <li><a href="#">FFmpeg Codec</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Plataforma</h4>
+                <ul>
+                    <li><a onclick="showSection('chat')">Chat IA</a></li>
+                    <li><a onclick="showSection('code')">Generador Código</a></li>
+                    <li><a onclick="showSection('images')">Imágenes</a></li>
+                    <li><a onclick="showSection('files')">Archivos</a></li>
+                    <li><a onclick="showSection('voice')">Síntesis Voz</a></li>
+                    <li><a onclick="showSection('admin')">Panel Admin</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Recursos</h4>
+                <ul>
+                    <li><a href="#">Documentación API</a></li>
+                    <li><a href="#">Modelos Soportados</a></li>
+                    <li><a href="#">Requisitos GPU</a></li>
+                    <li><a href="#">Guía de Despliegue</a></li>
+                    <li><a href="#">Docker Images</a></li>
+                    <li><a href="#">Benchmarks</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Términos de Uso</a></li>
+                    <li><a href="#">Privacidad</a></li>
+                    <li><a href="#">Licencia de Modelos</a></li>
+                    <li><a href="#">Uso Ético</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2026 OSAIA Labs · Arquitectura de IA · Python · C++ · CUDA · GLSL · PyTorch · TensorFlow · FFmpeg · Hecho con determinismo y gradientes.</p>
+        </div>
+    </footer>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modal" onclick="closeModalOnOverlay(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Información</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Contenido...
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Cerrar</button>
+                <button class="btn btn-primary" id="modalActionBtn">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="js/data.js"></script>
+    <script src="js/code-generator.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

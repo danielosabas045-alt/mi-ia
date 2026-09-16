@@ -1,0 +1,53 @@
+services:
+  osaia:
+    build: .
+    container_name: osaia
+    ports:
+      - "8000:8000"
+    environment:
+      - OSAIA_ENVIRONMENT=development
+      - OSAIA_DEBUG=true
+    volumes:
+      - ./storage:/app/storage
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./projects:/app/projects
+    restart: unless-stopped
+    networks:
+      - osaia-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: osaia-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - osaia-network
+    profiles:
+      - with-services
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: osaia-postgres
+    environment:
+      POSTGRES_USER: osaia
+      POSTGRES_PASSWORD: osaia
+      POSTGRES_DB: osaia
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - osaia-network
+    profiles:
+      - with-services
+
+networks:
+  osaia-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  postgres-data:
