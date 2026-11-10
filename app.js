@@ -246,6 +246,7 @@
     $('settingsBtn').addEventListener('click', openSettings);
     $('mobileSettings').addEventListener('click', openSettings);
     $('settingsClose').addEventListener('click', () => $('settingsDialog').close());
+    $('settingsCancel').addEventListener('click', () => $('settingsDialog').close());
     $('settingsForm').addEventListener('submit', e => {
       e.preventDefault();
       const value = $('endpointInput').value.trim();
