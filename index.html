@@ -1,6 +1,87 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080c18"><title>OSAIA AI — Tu asistente inteligente</title><style>
-:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#eaf0ff;background:#080c18}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 80% 0%,#26346c66,transparent 45%),#080c18}header{display:flex;align-items:center;justify-content:space-between;padding:19px 26px;border-bottom:1px solid #ffffff16;background:#0b1021b0}h1{font-size:20px;margin:0;letter-spacing:.5px}.brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,#7c5cff,#36b6e8);font-weight:900}.status{font-size:12px;color:#ffd48b;background:#6b4a182e;padding:8px 12px;border:1px solid #b37c4b55;border-radius:20px}main{max-width:850px;margin:auto;display:flex;flex-direction:column;height:calc(100vh - 80px);min-height:460px;padding:20px}#messages{flex:1;overflow:auto;display:flex;flex-direction:column;gap:14px;padding:12px 0}.welcome{margin:auto;text-align:center;max-width:520px}.welcome h2{font-size:clamp(28px,5vw,44px);margin:10px 0}.welcome p{color:#a9b5d2;line-height:1.7}.bubble{padding:14px 18px;border:1px solid #ffffff20;border-radius:18px;max-width:85%;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.user{align-self:flex-end;background:#5b48bf}.assistant{align-self:flex-start;background:#17213a}form{display:flex;gap:10px;border:1px solid #ffffff30;border-radius:20px;padding:10px;background:#11192d}input{flex:1;min-width:0;background:transparent;color:white;border:0;outline:0;font:inherit;padding:10px}button{background:#8165ff;color:white;border:0;border-radius:13px;padding:12px 18px;font-weight:700;cursor:pointer}button:hover{background:#977fff}footer{text-align:center;font-size:12px;color:#8d9bb9;padding:12px}a{color:#b9abff}@media(max-width:500px){header{padding:15px}main{padding:12px}.status{font-size:10px}}
-</style></head><body><header><div class="brand"><div class="logo">O</div><div><h1>OSAIA AI</h1><small style="color:#91a1c4">Versión web · desarrollo continuo</small></div></div><span class="status">IA aún sin conectar</span></header><main><section id="messages" aria-live="polite"><div class="welcome" id="welcome"><div style="font-size:40px">✦</div><h2>¿En qué puedo ayudarte?</h2><p>Bienvenido a OSAIA AI. Esta es la primera interfaz web publicada. La conexión con un modelo de inteligencia artificial todavía está pendiente; no se simulan respuestas.</p></div></section><form id="chat"><input id="prompt" aria-label="Mensaje" placeholder="Escribí tu mensaje..." required maxlength="10000" autocomplete="off"><button type="submit">Enviar ↑</button></form><footer>OSAIA AI · <a href="https://github.com/danielosabas045-alt/mi-ia">Código y cambios</a> · No ingresés claves API en el chat</footer></main><script>
-const form=document.getElementById('chat'),input=document.getElementById('prompt'),messages=document.getElementById('messages');function add(text,kind){document.getElementById('welcome')?.remove();const el=document.createElement('div');el.className='bubble '+kind;el.textContent=text;messages.append(el);messages.scrollTop=messages.scrollHeight}form.addEventListener('submit',e=>{e.preventDefault();const v=input.value.trim();if(!v)return;add(v,'user');input.value='';add('Todavía no tengo un proveedor de IA conectado. La interfaz web ya está preparada, pero las respuestas inteligentes requieren configurar un backend seguro.','assistant')});
-</script></body></html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080b16">
+  <meta name="description" content="OSAIA AI: interfaz web en desarrollo, herramientas locales y conexión opcional a un backend de inteligencia artificial.">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>OSAIA AI — Asistente inteligente</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside id="sidebar" class="sidebar" aria-label="Conversaciones y opciones">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">O</div>
+        <div><div class="brand-name">OSAIA AI</div><div class="brand-sub">Asistente · Web 0.2.0</div></div>
+      </div>
+      <button id="newChat" class="primary-btn" type="button"><span aria-hidden="true">＋</span> Nueva conversación</button>
+      <div class="section-label">Tus conversaciones</div>
+      <nav id="chatList" class="chat-list" aria-label="Historial de chats"></nav>
+      <div class="sidebar-footer">
+        <button id="settingsBtn" class="side-link" type="button"><span aria-hidden="true">⚙</span> Configurar servidor de IA</button>
+        <a class="side-link" href="https://github.com/danielosabas045-alt/mi-ia" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⌘</span> Código y actualizaciones</a>
+        <p class="sidebar-note">Las conversaciones se guardan en este navegador. No se envían a un servidor si no configurás uno.</p>
+      </div>
+    </aside>
+    <div id="overlay" class="overlay" hidden></div>
+    <main class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="menuToggle" class="icon-btn mobile-only" type="button" aria-label="Abrir menú">☰</button>
+          <div><h1 id="conversationTitle" class="conversation-title">Nueva conversación</h1><div class="eyebrow">OSAIA AI · desarrollo continuo</div></div>
+        </div>
+        <div class="topbar-actions">
+          <span id="connectionIndicator" class="status unconfigured" role="status">IA sin conectar</span>
+          <button id="clearChat" class="ghost-btn" type="button" title="Vaciar la conversación">Limpiar</button>
+          <button id="exportBtn" class="ghost-btn" type="button" title="Descargar conversaciones">Exportar</button>
+          <button id="mobileNew" class="icon-btn mobile-only" type="button" aria-label="Nueva conversación">＋</button>
+          <button id="mobileSettings" class="icon-btn mobile-only" type="button" aria-label="Ajustes">⚙</button>
+        </div>
+      </header>
+      <section id="thread" class="thread" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions"></section>
+      <div class="composer-wrap">
+        <div class="composer-inner">
+          <form id="chatForm" class="composer" autocomplete="off">
+            <label for="prompt" class="sr-only">Tu mensaje</label>
+            <textarea id="prompt" name="prompt" placeholder="Escribí tu mensaje a OSAIA AI..." rows="1" maxlength="8000" required></textarea>
+            <div class="composer-actions">
+              <div class="composer-left">
+                <button id="dictateBtn" class="icon-btn" type="button" title="Dictar con micrófono" aria-label="Dictar mensaje">♬</button>
+                <button id="helpBtn" class="icon-btn" type="button" title="Comandos locales" aria-label="Ver comandos">?</button>
+                <span id="promptCount" class="counter">0/8000</span>
+              </div>
+              <div class="composer-right">
+                <button id="abortBtn" class="stop-btn" type="button" hidden>Detener ■</button>
+                <button id="sendBtn" class="send-btn" type="submit">Enviar ↑</button>
+              </div>
+            </div>
+          </form>
+          <div class="composer-caption">Enter para enviar · Shift+Enter para nueva línea · Ctrl+K para nuevo chat · Sin IA conectada, usá /ayuda</div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+    <div class="settings-head">
+      <h2 id="settingsTitle">Configurar OSAIA AI</h2>
+      <button id="settingsClose" class="icon-btn" type="button" aria-label="Cerrar ajustes">×</button>
+    </div>
+    <form id="settingsForm" class="settings-content">
+      <p>Esta página funciona sin servidor para herramientas locales. Para recibir respuestas de un modelo de IA, necesitás un backend propio y seguro que acepte <code>POST</code> con <code>{ "messages": [...] }</code> y responda <code>{ "reply": "..." }</code>.</p>
+      <label for="endpointInput">URL HTTPS de tu backend de IA</label>
+      <input id="endpointInput" type="url" placeholder="https://tu-servidor.example/api/chat" autocomplete="off" spellcheck="false">
+      <p>La URL se guarda únicamente en este navegador. El servidor debe permitir CORS desde este sitio. La conexión se probará al enviar el primer mensaje.</p>
+      <div class="settings-warning"><strong>Seguridad:</strong> no pegues claves API, contraseñas ni tokens en la URL ni en el chat. Las credenciales del proveedor deben mantenerse exclusivamente en el servidor. Al conectar un backend, tus mensajes se enviarán a ese servidor.</div>
+      <div class="settings-actions">
+        <button type="button" class="ghost-btn" id="settingsCancel">Cancelar</button>
+        <button class="save-btn" type="submit">Guardar configuración</button>
+      </div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
