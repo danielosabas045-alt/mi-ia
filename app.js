@@ -156,7 +156,9 @@
   async function remoteReply(c, signal) {
     const endpoint = state.endpoint;
     if (!safeEndpoint(endpoint)) throw new Error('Configurá un servidor HTTPS válido en Ajustes.');
-    const messages = c.messages.filter(m => m.kind === 'remote' && m.origin === endpoint).slice(-24).map(m => ({ role: m.role, content: m.text }));
+    const messages = c.messages.filter(m => m.kind === 'remote' && m.origin === endpoint).slice(-20).map(m => ({ role: m.role, content: m.text }));
+    while (messages.length > 1 && (messages.reduce((sum, m) => sum + m.content.length, 0) > 26000 || new TextEncoder().encode(JSON.stringify({ messages })).byteLength > 40000)) messages.shift();
+    while (messages.length > 1 && messages[0].role !== 'user') messages.shift();
     const response = await fetch(endpoint, {
       method: 'POST', mode: 'cors', credentials: 'omit', redirect: 'error', referrerPolicy: 'no-referrer',
       headers: { 'Content-Type': 'application/json' },
