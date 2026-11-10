@@ -1,0 +1,53 @@
+name: OSAIA AI — probar y publicar web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'app.js'
+      - 'styles.css'
+      - 'tests/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: osaia-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Comprobar JavaScript
+        run: node --check app.js
+      - name: Ejecutar pruebas
+        run: node --test tests/web.test.cjs
+      - name: Preparar archivos públicos
+        run: |
+          mkdir -p public
+          cp index.html app.js styles.css public/
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Subir sitio
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar OSAIA AI
+        id: deployment
+        uses: actions/deploy-pages@v4
