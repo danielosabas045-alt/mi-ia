@@ -29,6 +29,7 @@
         created: Number(c.created) || now(), updated: Number(c.updated) || now(),
         messages: c.messages.slice(-MAX_MESSAGES).filter(m => m && ['user', 'assistant'].includes(m.role)).map(m => ({
           role: m.role, text: clean(m.text), kind: m.kind === 'local' ? 'local' : m.kind === 'remote' ? 'remote' : '',
+          origin: typeof m.origin === 'string' ? clean(m.origin, 500) : '',
           at: Number(m.at) || now()
         }))
       })) : [];
@@ -72,7 +73,7 @@
   }
   function addMessage(role, text, kind = '') {
     const c = chat(); if (!c) return;
-    const msg = { role, text: clean(text), kind, at: now() };
+    const msg = { role, text: clean(text), kind, origin: kind === 'remote' ? state.endpoint : '', at: now() };
     c.messages.push(msg); c.messages = c.messages.slice(-MAX_MESSAGES); c.updated = now();
     if (role === 'user' && c.title === 'Nueva conversación') c.title = clean(text.replace(/^\/[a-záéíóúñ]+\s*/i, ''), 43) || 'Nueva conversación';
     state.chats.sort((a, b) => b.updated - a.updated);
@@ -155,7 +156,7 @@
   async function remoteReply(c, signal) {
     const endpoint = state.endpoint;
     if (!safeEndpoint(endpoint)) throw new Error('Configurá un servidor HTTPS válido en Ajustes.');
-    const messages = c.messages.filter(m => m.role === 'user' || (m.role === 'assistant' && m.kind === 'remote')).slice(-24).map(m => ({ role: m.role, content: m.text }));
+    const messages = c.messages.filter(m => m.kind === 'remote' && m.origin === endpoint).slice(-24).map(m => ({ role: m.role, content: m.text }));
     const response = await fetch(endpoint, {
       method: 'POST', mode: 'cors', credentials: 'omit', redirect: 'error', referrerPolicy: 'no-referrer',
       headers: { 'Content-Type': 'application/json' },
@@ -172,8 +173,9 @@
     const value = $('prompt').value.trim(); if (!value) return;
     $('prompt').value = ''; resizePrompt();
     if (!chat()) makeChat();
-    const c = chat(); addMessage('user', value);
+    const c = chat();
     const answer = localCommand(value);
+    addMessage('user', value, answer !== null || !state.endpoint ? 'local' : 'remote');
     if (answer !== null) { addMessage('assistant', answer, 'local'); return; }
     if (!state.endpoint) {
       addMessage('assistant', 'La IA aún no está conectada. No voy a inventar una respuesta. Abrí Ajustes para configurar un backend HTTPS o escribí /ayuda para usar herramientas locales.', 'local');
