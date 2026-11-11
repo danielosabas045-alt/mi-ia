@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="OSAIA AI">
+  <defs><linearGradient id="g" x1="0" x2="1" y1="1" y2="0"><stop stop-color="#6650d4"/><stop offset="1" stop-color="#39b5e9"/></linearGradient></defs>
+  <rect width="512" height="512" rx="110" fill="#080b16"/>
+  <rect x="40" y="40" width="432" height="432" rx="100" fill="url(#g)"/>
+  <path d="M256 120c-84 0-136 59-136 136s52 136 136 136 136-59 136-136-52-136-136-136zm0 72c43 0 64 26 64 64s-21 64-64 64-64-26-64-64 21-64 64-64z" fill="#fff"/>
+  <path d="m371 100 12 29 29 12-29 12-12 29-12-29-29-12 29-12z" fill="#fff"/>
+</svg>
