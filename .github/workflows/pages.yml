@@ -7,6 +7,9 @@ on:
       - 'index.html'
       - 'app.js'
       - 'styles.css'
+      - 'sw.js'
+      - 'manifest.webmanifest'
+      - 'icons/**'
       - 'tests/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
@@ -35,7 +38,9 @@ jobs:
       - name: Preparar archivos públicos
         run: |
           mkdir -p public
-          cp index.html app.js styles.css public/
+          cp index.html app.js styles.css sw.js manifest.webmanifest public/
+          mkdir -p public/icons
+          cp icons/icon.svg public/icons/
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
       - name: Subir sitio
