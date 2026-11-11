@@ -2,9 +2,9 @@
 
 OSAIA AI es un proyecto de asistente en español. La **interfaz web** está en la raíz del repositorio y se puede servir como sitio estático; el **backend de IA** es un servicio separado para proteger las claves. El proyecto Android v6.0.1 se mantiene como objetivo, pero **su código completo todavía no está integrado en este repositorio**.
 
-## Estado real (10 de noviembre de 2026)
+## Estado real (11 de noviembre de 2026)
 
-- **Web 0.2.0:** interfaz de chat adaptable a celular, conversaciones locales, exportación JSON, dictado cuando el navegador lo permite, lectura en voz alta, comandos locales, ajustes y conexión opcional a un backend HTTPS.
+- **Web 0.3.0:** interfaz de chat adaptable a celular, conversaciones locales, exportación JSON, dictado cuando el navegador lo permite, lectura en voz alta, comandos locales, ajustes y conexión opcional a un backend HTTPS. Incluye manifiesto PWA y caché de archivos estáticos para herramientas locales sin conexión tras una primera visita con internet.
 - **IA generativa:** no está conectada de fábrica. No hay respuestas inventadas. Para habilitarla hay que desplegar un backend y configurar credenciales exclusivamente en el servidor.
 - **GitHub Pages:** el flujo de despliegue está preparado en .github/workflows/pages.yml, pero la URL pública **no debe darse por activa** hasta verificar el despliegue. Si aparece 404, habilitar Pages en los ajustes del repositorio.
 - **APK Android:** pendiente de compilación, firma y prueba real. No se ha publicado una APK nueva.
@@ -16,7 +16,15 @@ OSAIA AI es un proyecto de asistente en español. La **interfaz web** está en l
 3. Abrir la pestaña **Actions**, ejecutar o reintentar el flujo **OSAIA AI — probar y publicar web** y comprobar que finalice correctamente.
 4. Comprobar en un navegador la URL https://danielosabas045-alt.github.io/mi-ia/. El sitio solo está publicado cuando se carga realmente.
 
-En cada actualización de main, el flujo comprueba el JavaScript y ejecuta las pruebas antes de publicar los archivos estáticos. GitHub Pages **no puede alojar** el backend Node ni guardar claves de API privadas.
+En cada actualización de main, el flujo comprueba el JavaScript y ejecuta las pruebas antes de publicar los archivos estáticos, incluido el manifiesto, el service worker y el ícono. GitHub Pages **no puede alojar** el backend Node ni guardar claves de API privadas.
+
+## Uso sin conexión e instalación
+
+La versión 0.3.0 incluye un manifiesto web y un service worker. Después de visitar el sitio con internet y cargar los archivos, el navegador puede abrir la interfaz y ejecutar comandos locales sin conexión. Las conversaciones continúan guardadas localmente. **Las respuestas del modelo remoto necesitan internet y un backend operativo.** El navegador puede ofrecer la opción de instalar la web como aplicación, pero la compatibilidad depende de la plataforma y del soporte de íconos SVG.
+
+El worker solo almacena recursos estáticos de OSAIA AI, no llamadas a la API ni conversaciones. Para ver las mejoras diarias, recargá la página al recibir el aviso de actualización.
+
+El respaldo anterior a esta mejora está en la rama [backup/pre-pwa-2026-11-11](https://github.com/danielosabas045-alt/mi-ia/tree/backup/pre-pwa-2026-11-11).
 
 ## Herramientas locales reales
 
