@@ -1,4 +1,4 @@
-/* OSAIA AI Web v0.2.0 — sin claves incrustadas. */
+/* OSAIA AI Web v0.3.0 — sin claves incrustadas; herramientas locales sin conexión. */
 (() => {
   'use strict';
   const STORE = 'osaia_web_v2';
@@ -213,7 +213,7 @@
     try { rec.start(); toast('Escuchando…'); } catch (_) { toast('No se pudo iniciar el micrófono.'); }
   }
   function exportHistory() {
-    const data = JSON.stringify({ app: 'OSAIA AI', version: '0.2.0', exportedAt: new Date().toISOString(), chats: state.chats }, null, 2);
+    const data = JSON.stringify({ app: 'OSAIA AI', version: '0.3.0', exportedAt: new Date().toISOString(), chats: state.chats }, null, 2);
     const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
     const a = document.createElement('a'); a.href = url; a.download = 'OSAIA-AI-conversaciones.json';
     document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -227,6 +227,26 @@
   function toggleMenu() {
     const open = !$('sidebar').classList.contains('open');
     $('sidebar').classList.toggle('open', open); $('overlay').hidden = !open;
+  }
+  async function registerOfflineApp() {
+    if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+    try {
+      const registration = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+      registration.addEventListener('updatefound', () => {
+        const worker = registration.installing;
+        if (!worker) return;
+        worker.addEventListener('statechange', () => {
+          if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+            toast('OSAIA AI tiene una actualización. Recargá la página para verla.');
+          }
+        });
+      });
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) registration.update().catch(() => {});
+      });
+    } catch (_) {
+      console.warn('OSAIA AI: no se pudo activar el modo sin conexión.');
+    }
   }
   function init() {
     load();
@@ -266,7 +286,7 @@
     $('dictateBtn').addEventListener('click', startDictation);
     $('abortBtn').addEventListener('click', () => state.controller?.abort());
     $('helpBtn').addEventListener('click', () => { $('prompt').value = '/ayuda'; resizePrompt(); $('prompt').focus(); });
-    render(); resizePrompt();
+    render(); resizePrompt(); registerOfflineApp();
   }
   document.addEventListener('DOMContentLoaded', init);
 })();
