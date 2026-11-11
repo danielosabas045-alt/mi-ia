@@ -1,5 +1,23 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-11 — Web 0.3.0 (código publicado en GitHub)
+
+### Mejoras reales
+- Añadido manifiesto de aplicación web progresiva (PWA) y un ícono vectorial original.
+- Añadido service worker que guarda **únicamente archivos estáticos públicos** para permitir cargar la interfaz y ejecutar herramientas locales cuando no haya internet, después de una primera visita con conexión.
+- El worker no intercepta ni almacena solicitudes al backend de IA, conversaciones o respuestas.
+- Se detectan nuevas versiones al volver a la pestaña y se avisa que hay que recargar para verlas.
+- El flujo de GitHub Pages ahora incluye manifiesto, worker e ícono.
+- Nueva prueba automatizada para comprobar que el caché no intercepte solicitudes externas, POST ni rutas de API.
+- Respaldo previo en la rama `backup/pre-pwa-2026-11-11`.
+
+### Comprobaciones y limitaciones
+- 9 verificaciones estáticas y de sintaxis pasaron durante esta actualización.
+- **Pendiente:** confirmar el resultado de las pruebas completas en GitHub Actions y el despliegue público; no se pudo verificar la URL pública desde este entorno.
+- **Pendiente:** activar GitHub Pages si sigue deshabilitado.
+- **Pendiente:** IA generativa real (requiere backend y credenciales seguras) y APK Android compilada.
+- La instalación como PWA depende del navegador y sus requisitos; el ícono SVG puede no ser suficiente para todos los dispositivos.
+
 ## 2026-11-10 — Web 0.2.0 (código en GitHub)
 
 ### Interfaz y funciones
