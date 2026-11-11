@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "OSAIA AI — Asistente inteligente",
+  "short_name": "OSAIA AI",
+  "description": "Asistente en español con herramientas locales y conexión opcional a un servidor de IA seguro.",
+  "lang": "es-GT",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080b16",
+  "theme_color": "#080b16",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
