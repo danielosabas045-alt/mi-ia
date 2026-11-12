@@ -1,4 +1,4 @@
-/* OSAIA AI Web v0.3.0 — sin claves incrustadas; herramientas locales sin conexión. */
+/* OSAIA AI Web v0.3.1 — sin claves incrustadas; herramientas locales sin conexión. */
 (() => {
   'use strict';
   const STORE = 'osaia_web_v2';
@@ -165,14 +165,28 @@
       body: JSON.stringify({ messages }), signal
     });
     if (!response.ok) throw new Error('El servidor devolvió HTTP ' + response.status + '. Revisá la configuración del backend.');
-    const result = await response.json();
+    const type = response.headers.get('content-type') || '';
+    if (!type.toLowerCase().includes('application/json')) throw new Error('El servidor no devolvió JSON.');
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error('Respuesta vacía del servidor.');
+    const decoder = new TextDecoder(); let raw = '', bytes = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read(); if (done) break;
+        bytes += value.byteLength;
+        if (bytes > 128 * 1024) { await reader.cancel(); throw new Error('Respuesta demasiado grande.'); }
+        raw += decoder.decode(value, { stream: true });
+      }
+      raw += decoder.decode();
+    } finally { reader.releaseLock(); }
+    const result = JSON.parse(raw);
     const content = result?.reply ?? result?.message ?? result?.choices?.[0]?.message?.content;
     if (typeof content !== 'string' || !content.trim()) throw new Error('El servidor no devolvió texto. Se esperaba { "reply": "..." }.');
     return content.slice(0, 8000);
   }
   async function send() {
     if (state.busy) return;
-    const value = $('prompt').value.trim(); if (!value) return;
+    const value = clean($('prompt').value).trim(); if (!value) return;
     $('prompt').value = ''; resizePrompt();
     if (!chat()) makeChat();
     const c = chat();
@@ -207,19 +221,21 @@
   function startDictation() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) { toast('El reconocimiento de voz no está disponible en este navegador.'); return; }
+    if (!confirm('El reconocimiento de voz puede enviar audio al servicio de voz de tu navegador. ¿Continuar?')) return;
     const rec = new SpeechRecognition(); rec.lang = 'es-GT'; rec.interimResults = false;
-    rec.onresult = e => { $('prompt').value += ($('prompt').value ? ' ' : '') + e.results[0][0].transcript; resizePrompt(); $('prompt').focus(); };
+    rec.onresult = e => { $('prompt').value = clean($('prompt').value + ($('prompt').value ? ' ' : '') + e.results[0][0].transcript); resizePrompt(); $('prompt').focus(); };
     rec.onerror = () => toast('No se pudo reconocer la voz. Revisá el permiso del micrófono.');
     try { rec.start(); toast('Escuchando…'); } catch (_) { toast('No se pudo iniciar el micrófono.'); }
   }
   function exportHistory() {
-    const data = JSON.stringify({ app: 'OSAIA AI', version: '0.3.0', exportedAt: new Date().toISOString(), chats: state.chats }, null, 2);
+    const data = JSON.stringify({ app: 'OSAIA AI', version: '0.3.1', exportedAt: new Date().toISOString(), chats: state.chats }, null, 2);
     const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
     const a = document.createElement('a'); a.href = url; a.download = 'OSAIA-AI-conversaciones.json';
     document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
     toast('Exportación iniciada.');
   }
   function openSettings() {
+    if (state.busy) { toast('Detené la respuesta antes de cambiar el servidor.'); return; }
     $('endpointInput').value = state.endpoint;
     $('settingsDialog').showModal();
   }
@@ -273,8 +289,10 @@
     $('settingsCancel').addEventListener('click', () => $('settingsDialog').close());
     $('settingsForm').addEventListener('submit', e => {
       e.preventDefault();
+      if (state.busy) { toast('Detené la respuesta antes de cambiar el servidor.'); return; }
       const value = $('endpointInput').value.trim();
       if (value && !safeEndpoint(value)) { toast('Ingresá una URL HTTPS completa con ruta, sin clave, usuario ni parámetros.'); return; }
+      if (value && value !== state.endpoint && !confirm('¿Autorizar el envío de mensajes a ' + new URL(value).origin + '? Los mensajes nuevos y el contexto previo de este mismo servidor se enviarán allí.')) return;
       state.endpoint = value; save(); renderStatus(); $('settingsDialog').close();
       toast(value ? 'Servidor guardado. Se comprobará al enviar un mensaje.' : 'Modo local activado.');
     });
