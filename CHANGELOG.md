@@ -1,5 +1,14 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-12 — Web 0.3.1
+
+- Bloqueo de cambios de servidor durante respuestas activas para evitar mezclar orígenes de historial.
+- Confirmación explícita al cambiar de backend y antes de dictar audio.
+- Límite de 128 KiB para respuestas remotas y validación del tipo JSON; límite de texto también aplicado al dictado.
+- Caché estática excluye URLs con parámetros.
+- Cinco comprobaciones estáticas de presencia de cambios aprobadas; pruebas de ejecución y despliegue pendientes.
+- Sin APK nueva ni backend público verificado.
+
 ## 2026-11-11 — Web 0.3.0 (código publicado en GitHub)
 
 ### Mejoras reales
