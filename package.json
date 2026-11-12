@@ -1,7 +1,7 @@
 {
   "name": "osaia-ai-web",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "OSAIA AI: sitio estático y backend de IA separado sin secretos en el navegador",
   "scripts": {
     "start": "node server/server.cjs",
