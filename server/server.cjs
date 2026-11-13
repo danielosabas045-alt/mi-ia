@@ -57,6 +57,11 @@ function createServer(config = {}) {
   const apiKey = config.apiKey === undefined ? process.env.OPENAI_API_KEY : config.apiKey;
   const model = config.model || process.env.OSAIA_MODEL || DEFAULT_MODEL;
   const limiter = new Map();
+  // Process-wide cap protects the provider even when clients rotate IPs.
+  const globalLimit = config.globalLimit ?? 30;
+  const maxConcurrent = config.maxConcurrent ?? 3;
+  let globalMinute = -1, globalCount = 0, active = 0;
+  const providerFetch = config.providerFetch || fetch;
   return http.createServer(async (req, res) => {
     const origin = req.headers.origin;
     if (origin && origin !== allowedOrigin) return send(res, 403, { error: 'Origen no permitido' });
@@ -79,11 +84,18 @@ function createServer(config = {}) {
     }
     if (current > MAX_REQUESTS_PER_MINUTE) return send(res, 429, { error: 'Demasiadas solicitudes. Probá de nuevo en un minuto.' });
     if (!apiKey) return send(res, 503, { error: 'La IA aún no está configurada en el servidor.' });
+    if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] || '')) return send(res, 415, { error: 'Se requiere application/json.' });
+    if (active >= maxConcurrent) return send(res, 429, { error: 'Servidor ocupado. Intentá nuevamente.' });
+    active++;
     try {
       const input = await readJson(req);
-      const messages = validateMessages(input.messages);
+      const messages = validateMessages(input?.messages);
       if (!messages) return send(res, 400, { error: 'Mensajes inválidos o demasiado largos.' });
-      const upstream = await fetch('https://api.openai.com/v1/chat/completions', {
+      const nowMinute = Math.floor(Date.now() / 60000);
+      if (globalMinute !== nowMinute) { globalMinute = nowMinute; globalCount = 0; }
+      if (globalCount >= globalLimit) return send(res, 429, { error: 'Cuota temporal del servidor agotada.' });
+      globalCount++;
+      const upstream = await providerFetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -102,7 +114,7 @@ function createServer(config = {}) {
       return send(res, error.status || (error.name === 'TimeoutError' ? 504 : 502), {
         error: error.status ? error.message : error.name === 'TimeoutError' ? 'Tiempo de espera agotado.' : 'No se pudo completar la solicitud.'
       });
-    }
+    } finally { active--; }
   });
 }
 
