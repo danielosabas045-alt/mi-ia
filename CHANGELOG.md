@@ -1,5 +1,12 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-13 — Seguridad del backend
+
+- Cuota global de 30 llamadas por minuto y máximo de 3 solicitudes simultáneas por proceso; no sustituye autenticación ni cuotas persistentes.
+- Rechazo de tipos de contenido no JSON y manejo de JSON nulo.
+- Prueba de regresión con proveedor simulado añadida; ejecución CI pendiente de verificar.
+- Sin despliegue público ni APK verificados.
+
 ## 2026-11-12 — Web 0.3.1
 
 - Bloqueo de cambios de servidor durante respuestas activas para evitar mezclar orígenes de historial.
