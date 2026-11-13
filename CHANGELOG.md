@@ -1,5 +1,11 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-13 — Integración semanal
+
+- El flujo de pruebas y publicación ahora se activa también cuando cambia `server/**`, evitando omitir comprobaciones en cambios exclusivos del backend.
+- Commit de integración: `321df5b902fdc76de2b25e8c9321b036944b50f2`.
+- Ejecución CI, URL pública, proveedor real y APK nueva todavía no verificados. Render requiere autorización.
+
 ## 2026-11-13 — Seguridad del backend
 
 - Cuota global de 30 llamadas por minuto y máximo de 3 solicitudes simultáneas por proceso; no sustituye autenticación ni cuotas persistentes.
