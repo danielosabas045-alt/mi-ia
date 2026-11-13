@@ -10,6 +10,7 @@ on:
       - 'sw.js'
       - 'manifest.webmanifest'
       - 'icons/**'
+      - 'server/**'
       - 'tests/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
