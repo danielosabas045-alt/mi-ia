@@ -40,3 +40,18 @@ test('backend refuses unconfigured AI and disallowed origins', async t => {
   assert.equal(missingKey.status, 503);
   assert.match((await missingKey.json()).error, /aún no está configurada/);
 });
+
+
+test('backend bounds HTTP timeouts and rejects oversized declared bodies before provider calls', async t => {
+  let calls = 0;
+  const server = createServer({ apiKey: 'test-only', providerFetch: async () => { calls++; throw new Error('unexpected'); } });
+  assert.equal(server.requestTimeout, 15000);
+  assert.equal(server.headersTimeout, 10000);
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const response = await fetch('http://127.0.0.1:' + server.address().port + '/api/chat', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user', content: 'x'.repeat(50000) }] })
+  });
+  assert.equal(response.status, 413);
+  assert.equal(calls, 0);
+});
