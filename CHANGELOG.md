@@ -1,5 +1,12 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-14 — Límites HTTP
+
+- Tiempo máximo de recepción de solicitud de 15 segundos y cabeceras de 10 segundos; keep-alive de 5 segundos.
+- Rechazo temprano de cuerpos declarados mayores de 48 KiB antes de ocupar un turno de IA.
+- Prueba de regresión añadida con proveedor simulado; ejecución CI pendiente de verificar.
+- Sin APK nueva ni despliegue público verificados.
+
 ## 2026-11-13 — Integración semanal
 
 - El flujo de pruebas y publicación ahora se activa también cuando cambia `server/**`, evitando omitir comprobaciones en cambios exclusivos del backend.
