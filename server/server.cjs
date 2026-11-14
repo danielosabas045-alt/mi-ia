@@ -62,7 +62,7 @@ function createServer(config = {}) {
   const maxConcurrent = config.maxConcurrent ?? 3;
   let globalMinute = -1, globalCount = 0, active = 0;
   const providerFetch = config.providerFetch || fetch;
-  return http.createServer(async (req, res) => {
+  return http.createServer({ requestTimeout: 15000, headersTimeout: 10000, keepAliveTimeout: 5000 }, async (req, res) => {
     const origin = req.headers.origin;
     if (origin && origin !== allowedOrigin) return send(res, 403, { error: 'Origen no permitido' });
     if (origin === allowedOrigin) {
@@ -85,6 +85,7 @@ function createServer(config = {}) {
     if (current > MAX_REQUESTS_PER_MINUTE) return send(res, 429, { error: 'Demasiadas solicitudes. Probá de nuevo en un minuto.' });
     if (!apiKey) return send(res, 503, { error: 'La IA aún no está configurada en el servidor.' });
     if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] || '')) return send(res, 415, { error: 'Se requiere application/json.' });
+    if (Number(req.headers['content-length']) > MAX_BODY) return send(res, 413, { error: 'Solicitud demasiado grande' });
     if (active >= maxConcurrent) return send(res, 429, { error: 'Servidor ocupado. Intentá nuevamente.' });
     active++;
     try {
