@@ -1,5 +1,12 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-15 — Protección de consumo y memoria
+
+- Cuota global de 200 llamadas al proveedor por día UTC y por proceso, reiniciada al reiniciar el servidor; no equivale a un límite monetario ni persistente.
+- Límite estricto de 2000 entradas en el limitador IP para evitar crecimiento sin control.
+- Prueba de regresión de cuota diaria con proveedor simulado; ejecución pendiente de verificar.
+- Sin APK ni despliegue público verificados.
+
 ## 2026-11-14 — Límites HTTP
 
 - Tiempo máximo de recepción de solicitud de 15 segundos y cabeceras de 10 segundos; keep-alive de 5 segundos.
