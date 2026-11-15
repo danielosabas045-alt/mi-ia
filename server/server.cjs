@@ -60,6 +60,8 @@ function createServer(config = {}) {
   // Process-wide cap protects the provider even when clients rotate IPs.
   const globalLimit = config.globalLimit ?? 30;
   const maxConcurrent = config.maxConcurrent ?? 3;
+  const dailyLimit = config.dailyLimit ?? 200;
+  let globalDay = -1, dailyCount = 0;
   let globalMinute = -1, globalCount = 0, active = 0;
   const providerFetch = config.providerFetch || fetch;
   return http.createServer({ requestTimeout: 15000, headersTimeout: 10000, keepAliveTimeout: 5000 }, async (req, res) => {
@@ -78,10 +80,11 @@ function createServer(config = {}) {
     const minute = Math.floor(Date.now() / 60000);
     const old = limiter.get(ip);
     const current = old?.minute === minute ? old.count + 1 : 1;
-    limiter.set(ip, { minute, count: current });
-    if (limiter.size > 2000) {
+    if (!old && limiter.size >= 2000) {
       for (const [key, value] of limiter) if (value.minute !== minute) limiter.delete(key);
+      if (limiter.size >= 2000) return send(res, 429, { error: 'Servidor ocupado. Intentá nuevamente.' });
     }
+    limiter.set(ip, { minute, count: current });
     if (current > MAX_REQUESTS_PER_MINUTE) return send(res, 429, { error: 'Demasiadas solicitudes. Probá de nuevo en un minuto.' });
     if (!apiKey) return send(res, 503, { error: 'La IA aún no está configurada en el servidor.' });
     if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] || '')) return send(res, 415, { error: 'Se requiere application/json.' });
@@ -95,7 +98,11 @@ function createServer(config = {}) {
       const nowMinute = Math.floor(Date.now() / 60000);
       if (globalMinute !== nowMinute) { globalMinute = nowMinute; globalCount = 0; }
       if (globalCount >= globalLimit) return send(res, 429, { error: 'Cuota temporal del servidor agotada.' });
+      const nowDay = Math.floor(Date.now() / 86400000);
+      if (globalDay !== nowDay) { globalDay = nowDay; dailyCount = 0; }
+      if (dailyCount >= dailyLimit) return send(res, 429, { error: 'Cuota diaria del servidor agotada.' });
       globalCount++;
+      dailyCount++;
       const upstream = await providerFetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
