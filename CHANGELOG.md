@@ -1,5 +1,11 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-16 — Cancelación de solicitudes
+
+- El backend cancela la petición al proveedor cuando se desconecta el cliente, combinando la señal de desconexión con el tiempo máximo de 30 segundos.
+- Evita iniciar llamadas tras una desconexión detectada y libera el turno de concurrencia al finalizar. No garantiza evitar cobros ya iniciados.
+- Commit: `d11f991eeeeefe3e4be2ccd6b50454f9a65d90b4`. Pruebas de ejecución pendientes.
+
 ## 2026-11-15 — Protección de consumo y memoria
 
 - Cuota global de 200 llamadas al proveedor por día UTC y por proceso, reiniciada al reiniciar el servidor; no equivale a un límite monetario ni persistente.
