@@ -91,8 +91,12 @@ function createServer(config = {}) {
     if (Number(req.headers['content-length']) > MAX_BODY) return send(res, 413, { error: 'Solicitud demasiado grande' });
     if (active >= maxConcurrent) return send(res, 429, { error: 'Servidor ocupado. Intentá nuevamente.' });
     active++;
+    const disconnect = new AbortController();
+    const onClose = () => { if (!res.writableEnded) disconnect.abort(); };
+    res.once('close', onClose);
     try {
       const input = await readJson(req);
+      if (disconnect.signal.aborted || res.destroyed) return;
       const messages = validateMessages(input?.messages);
       if (!messages) return send(res, 400, { error: 'Mensajes inválidos o demasiado largos.' });
       const nowMinute = Math.floor(Date.now() / 60000);
@@ -111,7 +115,7 @@ function createServer(config = {}) {
           messages: [{ role: 'system', content: 'Sos OSAIA AI, un asistente útil, claro, preciso y amable. Respondé en español cuando te hablen en español. No inventés hechos ni capacidades.' }, ...messages],
           max_tokens: 900
         }),
-        signal: AbortSignal.timeout(30000)
+        signal: AbortSignal.any([AbortSignal.timeout(30000), disconnect.signal])
       });
       if (!upstream.ok) return send(res, 502, { error: 'El proveedor de IA rechazó la solicitud (HTTP ' + upstream.status + ').' });
       const data = await upstream.json();
@@ -119,10 +123,11 @@ function createServer(config = {}) {
       if (typeof reply !== 'string' || !reply.trim()) return send(res, 502, { error: 'El proveedor no devolvió una respuesta válida.' });
       return send(res, 200, { reply: reply.slice(0, 8000) });
     } catch (error) {
+      if (disconnect.signal.aborted || res.destroyed) return;
       return send(res, error.status || (error.name === 'TimeoutError' ? 504 : 502), {
         error: error.status ? error.message : error.name === 'TimeoutError' ? 'Tiempo de espera agotado.' : 'No se pudo completar la solicitud.'
       });
-    } finally { active--; }
+    } finally { res.removeListener('close', onClose); active--; }
   });
 }
 
