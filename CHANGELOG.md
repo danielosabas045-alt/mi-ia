@@ -1,5 +1,11 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-17 — Privacidad del proveedor
+
+- Solicitudes de chat con `store: false` y rechazo de redirecciones HTTP del proveedor; no garantiza retención cero.
+- Prueba de regresión con proveedor simulado añadida; ejecución CI pendiente de verificar.
+- Commit de backend: `5f8eb84e69f129121d17fe2642958ce7c9ac4220`.
+
 ## 2026-11-16 — Cancelación de solicitudes
 
 - El backend cancela la petición al proveedor cuando se desconecta el cliente, combinando la señal de desconexión con el tiempo máximo de 30 segundos.
