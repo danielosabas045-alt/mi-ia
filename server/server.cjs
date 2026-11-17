@@ -109,10 +109,12 @@ function createServer(config = {}) {
       dailyCount++;
       const upstream = await providerFetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
+        redirect: 'error',
         headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model,
           messages: [{ role: 'system', content: 'Sos OSAIA AI, un asistente útil, claro, preciso y amable. Respondé en español cuando te hablen en español. No inventés hechos ni capacidades.' }, ...messages],
+          store: false,
           max_tokens: 900
         }),
         signal: AbortSignal.any([AbortSignal.timeout(30000), disconnect.signal])
