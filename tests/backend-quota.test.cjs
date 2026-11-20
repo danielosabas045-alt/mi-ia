@@ -7,7 +7,7 @@ test('global quota limits provider calls and invalid JSON is rejected', async ()
   let calls = 0;
   const server = createServer({apiKey:'test-only', globalLimit:1, providerFetch:async () => {
     calls++;
-    return {ok:true,json:async()=>({choices:[{message:{content:'mock response'}}]})};
+    return new Response(JSON.stringify({choices:[{message:{content:'mock response'}}]}), {status:200,headers:{'Content-Type':'application/json'}});
   }});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const url = 'http://127.0.0.1:'+server.address().port+'/api/chat';
