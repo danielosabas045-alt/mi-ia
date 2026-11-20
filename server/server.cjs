@@ -120,7 +120,36 @@ function createServer(config = {}) {
         signal: AbortSignal.any([AbortSignal.timeout(30000), disconnect.signal])
       });
       if (!upstream.ok) return send(res, 502, { error: 'El proveedor de IA rechazó la solicitud (HTTP ' + upstream.status + ').' });
-      const data = await upstream.json();
+      // Bound provider responses before parsing: an upstream error or compromised
+      // gateway must not force unbounded JSON buffering in the Node process.
+      const responseType = upstream.headers?.get?.('content-type') || '';
+      if (!/^application\/json(?:\s*;|$)/i.test(responseType)) {
+        return send(res, 502, { error: 'Respuesta inválida del proveedor.' });
+      }
+      const maxResponseBytes = 128 * 1024;
+      const declaredBytes = Number(upstream.headers.get('content-length'));
+      if (Number.isFinite(declaredBytes) && declaredBytes > maxResponseBytes) {
+        return send(res, 502, { error: 'Respuesta demasiado grande del proveedor.' });
+      }
+      const reader = upstream.body?.getReader?.();
+      if (!reader) return send(res, 502, { error: 'Respuesta inválida del proveedor.' });
+      const chunks = [];
+      let bytes = 0;
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          bytes += value.byteLength;
+          if (bytes > maxResponseBytes) {
+            await reader.cancel();
+            return send(res, 502, { error: 'Respuesta demasiado grande del proveedor.' });
+          }
+          chunks.push(value);
+        }
+      } finally { reader.releaseLock(); }
+      let data;
+      try { data = JSON.parse(Buffer.concat(chunks).toString('utf8')); }
+      catch (_) { return send(res, 502, { error: 'JSON inválido del proveedor.' }); }
       const reply = data?.choices?.[0]?.message?.content;
       if (typeof reply !== 'string' || !reply.trim()) return send(res, 502, { error: 'El proveedor no devolvió una respuesta válida.' });
       return send(res, 200, { reply: reply.slice(0, 8000) });
