@@ -228,6 +228,7 @@
     try { rec.start(); toast('Escuchando…'); } catch (_) { toast('No se pudo iniciar el micrófono.'); }
   }
   function exportHistory() {
+    if (!confirm('La exportación incluirá todas tus conversaciones, incluso información privada. El archivo JSON no estará cifrado. ¿Querés descargarlo?')) return;
     const data = JSON.stringify({ app: 'OSAIA AI', version: '0.3.1', exportedAt: new Date().toISOString(), chats: state.chats }, null, 2);
     const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
     const a = document.createElement('a'); a.href = url; a.download = 'OSAIA-AI-conversaciones.json';
