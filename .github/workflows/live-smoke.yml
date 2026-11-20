@@ -1,0 +1,69 @@
+name: OSAIA AI — verificar URL pública
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'app.js'
+      - 'index.html'
+      - '.github/workflows/live-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar HTTP público con reintentos
+        id: smoke
+        shell: bash
+        run: |
+          result=FAIL
+          home_code=unknown
+          health_code=unknown
+          for attempt in $(seq 1 8); do
+            home_code=$(curl --silent --show-error --location --connect-timeout 8 --max-time 25 --output /tmp/osaia-home.html --write-out '%{http_code}' 'https://osaia-ai-web.onrender.com/' || true)
+            health_code=$(curl --silent --show-error --location --connect-timeout 8 --max-time 25 --output /tmp/osaia-health.json --write-out '%{http_code}' 'https://osaia-ai-web.onrender.com/health' || true)
+            if [[ "$home_code" == 200 && "$health_code" == 200 ]] && grep -q 'OSAIA AI' /tmp/osaia-home.html && grep -q '"status":"ok"' /tmp/osaia-health.json; then
+              result=PASS
+              break
+            fi
+            sleep 7
+          done
+          echo "result=$result" >> "$GITHUB_OUTPUT"
+          echo "home_code=$home_code" >> "$GITHUB_OUTPUT"
+          echo "health_code=$health_code" >> "$GITHUB_OUTPUT"
+      - name: Guardar resultado auditable
+        if: always()
+        env:
+          RESULT: ${{ steps.smoke.outputs.result }}
+          HOME_CODE: ${{ steps.smoke.outputs.home_code }}
+          HEALTH_CODE: ${{ steps.smoke.outputs.health_code }}
+        run: |
+          {
+            echo '# OSAIA AI — verificación externa'
+            echo
+            echo "Fecha UTC: $(date -u '+%Y-%m-%d %H:%M:%S')"
+            echo
+            echo "Resultado: ${RESULT:-FAIL}"
+            echo
+            echo "GET /: ${HOME_CODE:-unknown}"
+            echo
+            echo "GET /health: ${HEALTH_CODE:-unknown}"
+            echo
+            echo 'Se exige HTTP 200, HTML con OSAIA AI y respuesta saludable del backend.'
+            echo 'Esto no valida respuestas reales del proveedor de IA.'
+          } > DEPLOY_VERIFY.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add DEPLOY_VERIFY.md
+          git commit -m 'ci: record external Render web smoke check' || true
+          git push || true
+      - name: Fallar si no hay acceso público
+        if: steps.smoke.outputs.result != 'PASS'
+        run: exit 1
