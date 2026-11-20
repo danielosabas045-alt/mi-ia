@@ -1,5 +1,12 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-20 — Revisión semanal de privacidad
+
+- La exportación JSON ahora solicita confirmación explícita e informa que el archivo contiene conversaciones privadas sin cifrar.
+- Verificación de sintaxis JavaScript mediante compilación de la función antes de publicar el cambio; no sustituye una prueba de navegador.
+- Commit: `4c2069800f99493112ba81a38c61d8228c47c7c9`.
+- Render sigue requiriendo autorización; web pública, chat con IA real y APK firmada no verificados.
+
 ## 2026-11-20 — Validación de respuestas del proveedor
 
 - El backend rechaza respuestas del proveedor cuyo tipo no sea JSON, así como respuestas mayores de 128 KiB, incluso si el proveedor no declara Content-Length.
