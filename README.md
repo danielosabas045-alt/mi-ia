@@ -2,6 +2,18 @@
 
 OSAIA AI es un proyecto de asistente en español. La **interfaz web** está en la raíz del repositorio y se puede servir como sitio estático; el **backend de IA** es un servicio separado para proteger las claves. El proyecto Android v6.0.1 se mantiene como objetivo, pero **su código completo todavía no está integrado en este repositorio**.
 
+## Despliegue de Render (20 de noviembre de 2026)
+
+La interfaz web y la API Node ahora se sirven desde **el mismo servicio** `osaia-ai-web`. Servicio configurado en Render: `https://osaia-ai-web.onrender.com`. La dirección es asignada por Render; **no considerar accesibilidad pública ni chat real verificados** hasta probarlos mediante HTTP después del último despliegue.
+
+- Interfaz: `GET /`; recursos públicos: `/app.js`, `/styles.css`, `/sw.js`, `/manifest.webmanifest` y `/icons/icon.svg`.
+- Comprobación técnica: `GET /health`; solo muestra `aiConfigured: true` cuando existe una clave en el servidor.
+- Chat: `POST /api/chat`. Sin `OPENAI_API_KEY` responde 503, sin inventar mensajes de IA.
+- Configuración: Render > servicio `osaia-ai-web` > Environment > añadir `OPENAI_API_KEY` **en Render exclusivamente**. Verificar facturación y establecer controles de gasto antes de ofrecer el chat al público. No añadir ninguna clave a GitHub, app.js, HTML, APK o conversación.
+- En Ajustes de la web, la URL HTTPS del mismo servicio se sugiere para conectar. **Se pide consentimiento** antes de enviar mensajes; el historial persiste localmente en ese navegador.
+- Render ejecuta `npm run check` y `npm test` en la compilación (`postinstall`). Fallos de pruebas bloquean la publicación del código nuevo.
+- La APK Android sigue pendiente: el repositorio no contiene el proyecto Android, firma original ni una APK de actualización validada. Nunca reemplazar el certificado original o cambiar el identificador del paquete.
+
 ## Estado real (11 de noviembre de 2026)
 
 - **Web 0.3.0:** interfaz de chat adaptable a celular, conversaciones locales, exportación JSON, dictado cuando el navegador lo permite, lectura en voz alta, comandos locales, ajustes y conexión opcional a un backend HTTPS. Incluye manifiesto PWA y caché de archivos estáticos para herramientas locales sin conexión tras una primera visita con internet.
