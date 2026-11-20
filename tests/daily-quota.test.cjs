@@ -9,7 +9,7 @@ test('daily provider quota rejects excess calls before upstream', async () => {
     apiKey: 'test-only', dailyLimit: 1,
     providerFetch: async () => {
       calls++;
-      return { ok: true, json: async () => ({ choices: [{ message: { content: 'test' } }] }) };
+      return new Response(JSON.stringify({ choices: [{ message: { content: 'test' } }] }), {status:200,headers:{'Content-Type':'application/json'}});
     }
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
