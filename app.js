@@ -2,6 +2,8 @@
 (() => {
   'use strict';
   const STORE = 'osaia_web_v2';
+  // Pre-fill only; never transmit a conversation until the user explicitly consents in Settings.
+  const DEFAULT_ENDPOINT = location.origin === 'https://osaia-ai-web.onrender.com' ? location.origin + '/api/chat' : '';
   const MAX_CHATS = 25;
   const MAX_MESSAGES = 120;
   const $ = id => document.getElementById(id);
@@ -126,7 +128,7 @@
     const connected = Boolean(state.endpoint);
     $('connectionIndicator').textContent = connected ? 'Servidor configurado · sin verificar' : 'IA sin conectar';
     $('connectionIndicator').className = 'status ' + (connected ? 'configured' : 'unconfigured');
-    $('endpointInput').value = state.endpoint;
+    $('endpointInput').value = state.endpoint || DEFAULT_ENDPOINT;
     $('sendBtn').disabled = state.busy;
     $('abortBtn').hidden = !state.busy;
     $('sendBtn').hidden = state.busy;
@@ -237,7 +239,7 @@
   }
   function openSettings() {
     if (state.busy) { toast('Detené la respuesta antes de cambiar el servidor.'); return; }
-    $('endpointInput').value = state.endpoint;
+    $('endpointInput').value = state.endpoint || DEFAULT_ENDPOINT;
     $('settingsDialog').showModal();
   }
   function closeMenu() { $('sidebar').classList.remove('open'); $('overlay').hidden = true; }
