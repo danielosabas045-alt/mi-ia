@@ -5,6 +5,38 @@
  * En producción agregar protección antiabuso robusta y observabilidad.
  */
 const http = require('node:http');
+const { readFile } = require('node:fs/promises');
+const path = require('node:path');
+
+// Only these public files may be served. The backend, tests and secrets remain private.
+const STATIC_FILES = Object.freeze({
+  '/': ['index.html', 'text/html; charset=utf-8'],
+  '/index.html': ['index.html', 'text/html; charset=utf-8'],
+  '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
+  '/styles.css': ['styles.css', 'text/css; charset=utf-8'],
+  '/sw.js': ['sw.js', 'text/javascript; charset=utf-8'],
+  '/manifest.webmanifest': ['manifest.webmanifest', 'application/manifest+json'],
+  '/icons/icon.svg': ['icons/icon.svg', 'image/svg+xml']
+});
+async function serveStatic(req, res) {
+  if (!Object.hasOwn(STATIC_FILES, req.url || '')) return false;
+  const [fileName, contentType] = STATIC_FILES[req.url];
+  try {
+    const body = await readFile(path.join(__dirname, '..', fileName));
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Cache-Control': 'no-cache',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'Referrer-Policy': 'no-referrer',
+      'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https:; object-src 'none'; base-uri 'none'; form-action 'none'"
+    });
+    res.end(body);
+  } catch (_) {
+    send(res, 500, { error: 'No se pudo cargar la interfaz.' });
+  }
+  return true;
+}
 
 const MAX_BODY = 48 * 1024;
 const MAX_REQUESTS_PER_MINUTE = 12;
@@ -54,6 +86,7 @@ async function readJson(req) {
 
 function createServer(config = {}) {
   const allowedOrigin = config.allowedOrigin || process.env.ALLOWED_ORIGIN || DEFAULT_ORIGIN;
+  const publicOrigin = config.publicOrigin || process.env.OSAIA_PUBLIC_ORIGIN || 'https://osaia-ai-web.onrender.com';
   const apiKey = config.apiKey === undefined ? process.env.OPENAI_API_KEY : config.apiKey;
   const model = config.model || process.env.OSAIA_MODEL || DEFAULT_MODEL;
   const limiter = new Map();
@@ -66,15 +99,16 @@ function createServer(config = {}) {
   const providerFetch = config.providerFetch || fetch;
   return http.createServer({ requestTimeout: 15000, headersTimeout: 10000, keepAliveTimeout: 5000 }, async (req, res) => {
     const origin = req.headers.origin;
-    if (origin && origin !== allowedOrigin) return send(res, 403, { error: 'Origen no permitido' });
-    if (origin === allowedOrigin) {
-      res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+    if (origin && origin !== allowedOrigin && origin !== publicOrigin) return send(res, 403, { error: 'Origen no permitido' });
+    if (origin === allowedOrigin || origin === publicOrigin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
       res.setHeader('Vary', 'Origin');
     }
     if (req.method === 'OPTIONS' && req.url === '/api/chat') { res.writeHead(204); return res.end(); }
     if (req.method === 'GET' && req.url === '/health') return send(res, 200, { status: 'ok', aiConfigured: Boolean(apiKey) });
+    if (req.method === 'GET' && await serveStatic(req, res)) return;
     if (req.method !== 'POST' || req.url !== '/api/chat') return send(res, 404, { error: 'Ruta no encontrada' });
     const ip = req.socket.remoteAddress || 'unknown';
     const minute = Math.floor(Date.now() / 60000);
