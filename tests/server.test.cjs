@@ -55,3 +55,30 @@ test('backend bounds HTTP timeouts and rejects oversized declared bodies before 
   assert.equal(response.status, 413);
   assert.equal(calls, 0);
 });
+
+test('provider response must be JSON and bounded even without content-length', async t => {
+  let calls = 0;
+  const server = createServer({
+    apiKey: 'test-only',
+    providerFetch: async () => {
+      calls++;
+      if (calls === 1) return new Response('<html>bad</html>', { status: 200, headers: { 'Content-Type': 'text/html' } });
+      if (calls === 2) return new Response('x'.repeat(140 * 1024), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ choices: [{ message: { content: 'Respuesta válida' } }] }), {
+        status: 200, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const url = 'http://127.0.0.1:' + server.address().port + '/api/chat';
+  const request = () => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: [{ role: 'user', content: 'Hola' }] }) });
+  const invalidType = await request();
+  assert.equal(invalidType.status, 502);
+  const oversized = await request();
+  assert.equal(oversized.status, 502);
+  const valid = await request();
+  assert.equal(valid.status, 200);
+  assert.equal((await valid.json()).reply, 'Respuesta válida');
+});
