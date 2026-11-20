@@ -7,7 +7,7 @@ test('provider requests disable storage and redirects', async () => {
   let options;
   const server = createServer({ apiKey: 'test-only', providerFetch: async (url, init) => {
     options = init;
-    return new Response(JSON.stringify({choices:[{message:{content:'Respuesta de prueba'}}]}), {status:200});
+    return new Response(JSON.stringify({choices:[{message:{content:'Respuesta de prueba'}}]}), {status:200,headers:{'Content-Type':'application/json'}});
   }});
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   try {
