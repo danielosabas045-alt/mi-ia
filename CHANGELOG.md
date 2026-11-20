@@ -1,5 +1,13 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-20 — Validación de respuestas del proveedor
+
+- El backend rechaza respuestas del proveedor cuyo tipo no sea JSON, así como respuestas mayores de 128 KiB, incluso si el proveedor no declara Content-Length.
+- Lectura por fragmentos con límite de memoria y errores controlados para JSON inválido.
+- Añadida prueba de regresión para tipo incorrecto, tamaño excesivo y respuesta válida.
+- Commits: `3e1c420f4fc7e8b42b22bcd31e0629fb7fdaf945` y `d988384453668e1dc7d5d978acf7e8c7e3a90393`.
+- Pruebas de ejecución/CI pendientes de confirmar; no se ha verificado despliegue web ni APK nueva. Render solicita autorización.
+
 ## 2026-11-17 — Privacidad del proveedor
 
 - Solicitudes de chat con `store: false` y rechazo de redirecciones HTTP del proveedor; no garantiza retención cero.
