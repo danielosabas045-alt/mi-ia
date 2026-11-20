@@ -1,5 +1,15 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-20 — Primer despliegue web público comprobado
+
+- Render confirma que la última versión de `osaia-ai-web` está `live` y escucha en el puerto asignado.
+- La compilación ejecutó `node --check` y **19/19 pruebas automatizadas** con **0 fallos** (incluida la prueba de servidor web y rutas privadas).
+- Se arreglaron tres fixtures de pruebas antiguas que simulaban respuestas del proveedor sin `Content-Type: application/json`, conservando la validación estricta del backend.
+- GitHub Actions probó desde fuera la dirección Render: **GET /** y **GET /health** respondieron **HTTP 200**. Ver [DEPLOY_VERIFY.md](DEPLOY_VERIFY.md).
+- La interfaz está publicada; **no equivale a IA generativa activa**: requiere configurar `OPENAI_API_KEY` en Render, verificar un chat real y establecer límites de gasto y acceso adecuados.
+- Se revisó la fuente Android v6.0.1 local: versionCode 61, package id conservado, 17/17 pruebas unitarias. No se compiló APK nueva por ausencia de Android SDK; pruebas de navegador no ejecutadas por faltar Playwright. El certificado de firma original no se subió al repositorio.
+- Commits de corrección de pruebas: `e32a03ae6eaf8eeeb177ace0d5741f8d951d670d`, `feb29881c5deb9bd298f5ee7e9d8308666e197af`, `dcb30122c061dc9ec5ffef989e202571234e37ab`. Verificador público: `a78d04f5e2681336c0c2c7f51cedf804a538ee11`.
+
 ## 2026-11-20 — Alojamiento de OSAIA AI Web en Render
 
 - Se creó el servicio gratuito independiente `osaia-ai-web` en Render, enlazado a `danielosabas045-alt/mi-ia` (main); no se modificó EMA.
