@@ -4,7 +4,7 @@ OSAIA AI es un proyecto de asistente en español. La **interfaz web** está en l
 
 ## Despliegue de Render (20 de noviembre de 2026)
 
-La interfaz web y la API Node ahora se sirven desde **el mismo servicio** `osaia-ai-web`. Servicio configurado en Render: `https://osaia-ai-web.onrender.com`. La dirección es asignada por Render; **no considerar accesibilidad pública ni chat real verificados** hasta probarlos mediante HTTP después del último despliegue.
+La interfaz web y la API Node ahora se sirven desde **el mismo servicio** `osaia-ai-web`. Servicio configurado en Render: `https://osaia-ai-web.onrender.com`. La **accesibilidad pública de la interfaz está verificada**: GitHub Actions obtuvo HTTP 200 tanto en `/` como en `/health` (ver [DEPLOY_VERIFY.md](DEPLOY_VERIFY.md)); Render terminó el despliegue con 19/19 pruebas aprobadas. **El chat con un modelo de IA real sigue sin estar verificado** hasta configurar el proveedor privado en Render.
 
 - Interfaz: `GET /`; recursos públicos: `/app.js`, `/styles.css`, `/sw.js`, `/manifest.webmanifest` y `/icons/icon.svg`.
 - Comprobación técnica: `GET /health`; solo muestra `aiConfigured: true` cuando existe una clave en el servidor.
