@@ -1,5 +1,16 @@
 # Registro de cambios — OSAIA AI
 
+## 2026-11-20 — Alojamiento de OSAIA AI Web en Render
+
+- Se creó el servicio gratuito independiente `osaia-ai-web` en Render, enlazado a `danielosabas045-alt/mi-ia` (main); no se modificó EMA.
+- El primer despliegue del backend informó estado `live`, pero su ruta `/` devolvía 404 por diseño: solo atendía `/health` y `/api/chat`.
+- Se añadió publicación segura de la interfaz y archivos públicos por lista explícita en el mismo servicio Node; ningún archivo de servidor, pruebas o secretos se expone como estático.
+- Se aceptó el origen conocido de Render para las peticiones del navegador y se añadió una prueba que cubre página principal, recursos estáticos, rutas privadas, CORS y ausencia de credenciales del proveedor.
+- En Ajustes de la web se sugiere la ruta de chat del propio Render sin activarla automáticamente: se requiere consentimiento explícito antes de transmitir conversaciones.
+- La compilación ahora ejecuta comprobación de sintaxis y pruebas automatizadas; un fallo debe impedir publicar una nueva compilación.
+- Pendiente: confirmar HTTP público tras el nuevo despliegue, configurar `OPENAI_API_KEY` de manera privada y probar respuestas reales. No existe APK Android firmada y comprobada.
+- Commits: `809bded5f1129fc5bbaa63e4295dd1525c1b9b49`, `12e7482c4985ea3d39aeb729c9b57c4ee5c6b6f2`, `b85be6b4e0e9408fde2a33862b23ed323d5aa0a6`, `f4194d80108558d06de692c9fcad9c3dee5e320d`.
+
 ## 2026-11-20 — Revisión semanal de privacidad
 
 - La exportación JSON ahora solicita confirmación explícita e informa que el archivo contiene conversaciones privadas sin cifrar.
