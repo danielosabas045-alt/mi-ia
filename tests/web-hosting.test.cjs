@@ -9,6 +9,10 @@ test('Render serves the web app, public assets, and API without exposing private
   t.after(() => new Promise(resolve => server.close(resolve)));
   const base = 'http://127.0.0.1:' + server.address().port;
 
+  const version = await fetch(base + '/version?utm_source=chatgpt.com');
+  assert.equal(version.status, 200);
+  assert.equal((await version.json()).version, '0.3.2');
+
   const tracked = await fetch(base + '/?utm_source=chatgpt.com');
   assert.equal(tracked.status, 200, 'ChatGPT tracking parameter must not break homepage');
   assert.match(await tracked.text(), /OSAIA AI/);
