@@ -42,6 +42,7 @@ const MAX_BODY = 48 * 1024;
 const MAX_REQUESTS_PER_MINUTE = 12;
 const DEFAULT_ORIGIN = 'https://danielosabas045-alt.github.io';
 const DEFAULT_MODEL = 'gpt-4.1-mini';
+const RELEASE = '0.3.2';
 
 function send(res, status, payload) {
   res.writeHead(status, {
@@ -110,6 +111,7 @@ function createServer(config = {}) {
     }
     if (req.method === 'OPTIONS' && pathname === '/api/chat') { res.writeHead(204); return res.end(); }
     if (req.method === 'GET' && pathname === '/health') return send(res, 200, { status: 'ok', aiConfigured: Boolean(apiKey) });
+    if (req.method === 'GET' && pathname === '/version') return send(res, 200, { version: RELEASE, commit: (process.env.RENDER_GIT_COMMIT || '').slice(0, 7) || null });
     if (req.method === 'GET' && await serveStatic(req, res, pathname)) return;
     if (req.method !== 'POST' || pathname !== '/api/chat') return send(res, 404, { error: 'Ruta no encontrada' });
     const ip = req.socket.remoteAddress || 'unknown';
@@ -155,7 +157,23 @@ function createServer(config = {}) {
         }),
         signal: AbortSignal.any([AbortSignal.timeout(30000), disconnect.signal])
       });
-      if (!upstream.ok) return send(res, 502, { error: 'El proveedor de IA rechazó la solicitud (HTTP ' + upstream.status + ').' });
+      if (!upstream.ok) {
+        // Do not log provider response bodies: they can contain private account details.
+        const status = upstream.status;
+        console.warn('[OSAIA] OpenAI devolvió HTTP ' + status + ' para el modelo ' + model);
+        const advice = status === 401
+          ? 'OpenAI rechazó la clave API (HTTP 401). Verificá la clave OPENAI_API_KEY guardada en Render.'
+          : status === 403
+            ? 'OpenAI denegó el acceso (HTTP 403). Revisá los permisos del proyecto y del modelo.'
+            : status === 429
+              ? 'OpenAI devolvió HTTP 429: cuota agotada o demasiadas solicitudes. Revisá facturación, saldo y límites de uso de la API.'
+              : status === 404
+                ? 'OpenAI devolvió HTTP 404: modelo no disponible. Revisá OSAIA_MODEL en Render.'
+                : status === 400
+                  ? 'OpenAI devolvió HTTP 400: solicitud incompatible con el modelo configurado. Revisá OSAIA_MODEL.'
+                  : 'OpenAI no pudo procesar la solicitud (HTTP ' + status + '). Intentá de nuevo o revisá el proveedor.';
+        return send(res, 502, { error: advice, providerStatus: status });
+      }
       // Bound provider responses before parsing: an upstream error or compromised
       // gateway must not force unbounded JSON buffering in the Node process.
       const responseType = upstream.headers?.get?.('content-type') || '';
@@ -191,6 +209,8 @@ function createServer(config = {}) {
       return send(res, 200, { reply: reply.slice(0, 8000) });
     } catch (error) {
       if (disconnect.signal.aborted || res.destroyed) return;
+      // Avoid logging credentials, prompts, upstream response bodies or full errors.
+      console.error('[OSAIA] Fallo de backend: ' + String(error?.name || 'Error').slice(0, 60));
       return send(res, error.status || (error.name === 'TimeoutError' ? 504 : 502), {
         error: error.status ? error.message : error.name === 'TimeoutError' ? 'Tiempo de espera agotado.' : 'No se pudo completar la solicitud.'
       });
