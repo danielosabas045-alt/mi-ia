@@ -6,6 +6,9 @@ on:
     paths:
       - 'server/**'
       - 'app.js'
+      - 'sw.js'
+      - 'package.json'
+      - 'tests/**'
       - 'index.html'
       - '.github/workflows/live-smoke.yml'
   workflow_dispatch:
@@ -26,10 +29,15 @@ jobs:
           result=FAIL
           home_code=unknown
           health_code=unknown
-          for attempt in $(seq 1 8); do
+          tracked_code=unknown
+          version_code=unknown
+          expected_version=$(node -p "require('./package.json').version")
+          for attempt in $(seq 1 12); do
             home_code=$(curl --silent --show-error --location --connect-timeout 8 --max-time 25 --output /tmp/osaia-home.html --write-out '%{http_code}' 'https://osaia-ai-web.onrender.com/' || true)
             health_code=$(curl --silent --show-error --location --connect-timeout 8 --max-time 25 --output /tmp/osaia-health.json --write-out '%{http_code}' 'https://osaia-ai-web.onrender.com/health' || true)
-            if [[ "$home_code" == 200 && "$health_code" == 200 ]] && grep -q 'OSAIA AI' /tmp/osaia-home.html && grep -q '"status":"ok"' /tmp/osaia-health.json; then
+            tracked_code=$(curl --silent --show-error --location --connect-timeout 8 --max-time 25 --output /tmp/osaia-tracked.html --write-out '%{http_code}' 'https://osaia-ai-web.onrender.com/?utm_source=chatgpt.com' || true)
+            version_code=$(curl --silent --show-error --location --connect-timeout 8 --max-time 25 --output /tmp/osaia-version.json --write-out '%{http_code}' 'https://osaia-ai-web.onrender.com/version' || true)
+            if [[ "$home_code" == 200 && "$health_code" == 200 && "$tracked_code" == 200 && "$version_code" == 200 ]] && grep -q 'OSAIA AI' /tmp/osaia-home.html && grep -q 'OSAIA AI' /tmp/osaia-tracked.html && grep -q '"status":"ok"' /tmp/osaia-health.json && grep -q "$expected_version" /tmp/osaia-version.json; then
               result=PASS
               break
             fi
@@ -38,12 +46,18 @@ jobs:
           echo "result=$result" >> "$GITHUB_OUTPUT"
           echo "home_code=$home_code" >> "$GITHUB_OUTPUT"
           echo "health_code=$health_code" >> "$GITHUB_OUTPUT"
+          echo "tracked_code=$tracked_code" >> "$GITHUB_OUTPUT"
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+          echo "expected_version=$expected_version" >> "$GITHUB_OUTPUT"
       - name: Guardar resultado auditable
         if: always()
         env:
           RESULT: ${{ steps.smoke.outputs.result }}
           HOME_CODE: ${{ steps.smoke.outputs.home_code }}
           HEALTH_CODE: ${{ steps.smoke.outputs.health_code }}
+          TRACKED_CODE: ${{ steps.smoke.outputs.tracked_code }}
+          VERSION_CODE: ${{ steps.smoke.outputs.version_code }}
+          EXPECTED_VERSION: ${{ steps.smoke.outputs.expected_version }}
         run: |
           {
             echo '# OSAIA AI — verificación externa'
@@ -55,15 +69,20 @@ jobs:
             echo "GET /: ${HOME_CODE:-unknown}"
             echo
             echo "GET /health: ${HEALTH_CODE:-unknown}"
+            echo "GET /?utm_source=chatgpt.com: ${TRACKED_CODE:-unknown}"
+            echo "GET /version: ${VERSION_CODE:-unknown}"
+            echo "Versión esperada: ${EXPECTED_VERSION:-unknown}"
             echo
             echo 'Se exige HTTP 200, HTML con OSAIA AI y respuesta saludable del backend.'
             echo 'Esto no valida respuestas reales del proveedor de IA.'
           } > DEPLOY_VERIFY.md
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add DEPLOY_VERIFY.md
-          git commit -m 'ci: record external Render web smoke check' || true
-          git push || true
+          if [[ "${RESULT:-FAIL}" == PASS ]]; then
+            git add DEPLOY_VERIFY.md
+            git commit -m 'ci: record verified live OSAIA release' || true
+            git push || true
+          fi
       - name: Fallar si no hay acceso público
         if: steps.smoke.outputs.result != 'PASS'
         run: exit 1
