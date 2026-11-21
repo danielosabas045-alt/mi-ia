@@ -1,6 +1,6 @@
-/* OSAIA AI Web 0.3.1: únicamente archivos públicos; jamás almacenar chats ni respuestas de IA. */
+/* OSAIA AI Web 0.3.2: únicamente archivos públicos; jamás almacenar chats ni respuestas de IA. */
 'use strict';
-const CACHE = 'osaia-static-v0.3.1';
+const CACHE = 'osaia-static-v0.3.2';
 const ASSETS = ['./', './index.html', './app.js', './styles.css', './manifest.webmanifest', './icons/icon.svg'];
 const allowedPaths = new Set(ASSETS.map(path => new URL(path, self.registration.scope).pathname));
 
