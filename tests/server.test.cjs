@@ -82,3 +82,41 @@ test('provider response must be JSON and bounded even without content-length', a
   assert.equal(valid.status, 200);
   assert.equal((await valid.json()).reply, 'Respuesta válida');
 });
+
+test('OpenAI errors are actionable but never expose provider response bodies', async t => {
+  const upstreamCodes = [401, 403, 429, 404, 400, 503];
+  let i = 0;
+  const server = createServer({
+    apiKey: 'test-only',
+    providerFetch: async () => new Response('secret-upstream-account-details', { status: upstreamCodes[i++] })
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const url = 'http://127.0.0.1:' + server.address().port + '/api/chat';
+  for (const expected of upstreamCodes) {
+    const response = await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: 'Hola' }] })
+    });
+    assert.equal(response.status, 502);
+    const data = await response.json();
+    assert.equal(data.providerStatus, expected);
+    assert.match(data.error, new RegExp('HTTP ' + expected));
+    assert.doesNotMatch(JSON.stringify(data), /secret-upstream-account-details/);
+  }
+});
+
+test('a failed provider network request does not leak exception details', async t => {
+  const server = createServer({
+    apiKey: 'test-only',
+    providerFetch: async () => { throw new Error('fake-private-token-secret'); }
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const response = await fetch('http://127.0.0.1:' + server.address().port + '/api/chat', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: [{ role: 'user', content: 'Hola' }] })
+  });
+  assert.equal(response.status, 502);
+  assert.doesNotMatch(JSON.stringify(await response.json()), /fake-private-token-secret/);
+});
