@@ -18,9 +18,9 @@ const STATIC_FILES = Object.freeze({
   '/manifest.webmanifest': ['manifest.webmanifest', 'application/manifest+json'],
   '/icons/icon.svg': ['icons/icon.svg', 'image/svg+xml']
 });
-async function serveStatic(req, res) {
-  if (!Object.hasOwn(STATIC_FILES, req.url || '')) return false;
-  const [fileName, contentType] = STATIC_FILES[req.url];
+async function serveStatic(req, res, pathname) {
+  if (!Object.hasOwn(STATIC_FILES, pathname)) return false;
+  const [fileName, contentType] = STATIC_FILES[pathname];
   try {
     const body = await readFile(path.join(__dirname, '..', fileName));
     res.writeHead(200, {
@@ -98,6 +98,8 @@ function createServer(config = {}) {
   let globalMinute = -1, globalCount = 0, active = 0;
   const providerFetch = config.providerFetch || fetch;
   return http.createServer({ requestTimeout: 15000, headersTimeout: 10000, keepAliveTimeout: 5000 }, async (req, res) => {
+    // Query strings (e.g. ?utm_source=chatgpt.com) are not part of the route.
+    const pathname = new URL(req.url || '/', 'http://localhost').pathname;
     const origin = req.headers.origin;
     if (origin && origin !== allowedOrigin && origin !== publicOrigin) return send(res, 403, { error: 'Origen no permitido' });
     if (origin === allowedOrigin || origin === publicOrigin) {
@@ -106,10 +108,10 @@ function createServer(config = {}) {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
       res.setHeader('Vary', 'Origin');
     }
-    if (req.method === 'OPTIONS' && req.url === '/api/chat') { res.writeHead(204); return res.end(); }
-    if (req.method === 'GET' && req.url === '/health') return send(res, 200, { status: 'ok', aiConfigured: Boolean(apiKey) });
-    if (req.method === 'GET' && await serveStatic(req, res)) return;
-    if (req.method !== 'POST' || req.url !== '/api/chat') return send(res, 404, { error: 'Ruta no encontrada' });
+    if (req.method === 'OPTIONS' && pathname === '/api/chat') { res.writeHead(204); return res.end(); }
+    if (req.method === 'GET' && pathname === '/health') return send(res, 200, { status: 'ok', aiConfigured: Boolean(apiKey) });
+    if (req.method === 'GET' && await serveStatic(req, res, pathname)) return;
+    if (req.method !== 'POST' || pathname !== '/api/chat') return send(res, 404, { error: 'Ruta no encontrada' });
     const ip = req.socket.remoteAddress || 'unknown';
     const minute = Math.floor(Date.now() / 60000);
     const old = limiter.get(ip);
