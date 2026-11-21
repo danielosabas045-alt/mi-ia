@@ -1,4 +1,4 @@
-/* OSAIA AI Web v0.3.1 — sin claves incrustadas; herramientas locales sin conexión. */
+/* OSAIA AI Web v0.3.2 — sin claves incrustadas; herramientas locales sin conexión. */
 (() => {
   'use strict';
   const STORE = 'osaia_web_v2';
@@ -166,9 +166,10 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages }), signal
     });
-    if (!response.ok) throw new Error('El servidor devolvió HTTP ' + response.status + '. Revisá la configuración del backend.');
     const type = response.headers.get('content-type') || '';
-    if (!type.toLowerCase().includes('application/json')) throw new Error('El servidor no devolvió JSON.');
+    if (!type.toLowerCase().includes('application/json')) {
+      throw new Error(response.ok ? 'El servidor no devolvió JSON.' : 'El servidor devolvió HTTP ' + response.status + ' sin un mensaje JSON.');
+    }
     const reader = response.body?.getReader();
     if (!reader) throw new Error('Respuesta vacía del servidor.');
     const decoder = new TextDecoder(); let raw = '', bytes = 0;
@@ -181,7 +182,16 @@
       }
       raw += decoder.decode();
     } finally { reader.releaseLock(); }
-    const result = JSON.parse(raw);
+    let result;
+    try { result = JSON.parse(raw); }
+    catch (_) { throw new Error('El servidor devolvió JSON inválido (HTTP ' + response.status + ').'); }
+    if (!response.ok) {
+      // The backend returns a safe, actionable message; show it instead of hiding it behind HTTP 502.
+      const detail = typeof result?.error === 'string' && result.error.trim()
+        ? result.error.trim().slice(0, 280)
+        : 'No se pudo completar la solicitud.';
+      throw new Error('HTTP ' + response.status + ': ' + detail);
+    }
     const content = result?.reply ?? result?.message ?? result?.choices?.[0]?.message?.content;
     if (typeof content !== 'string' || !content.trim()) throw new Error('El servidor no devolvió texto. Se esperaba { "reply": "..." }.');
     return content.slice(0, 8000);
@@ -231,7 +241,7 @@
   }
   function exportHistory() {
     if (!confirm('La exportación incluirá todas tus conversaciones, incluso información privada. El archivo JSON no estará cifrado. ¿Querés descargarlo?')) return;
-    const data = JSON.stringify({ app: 'OSAIA AI', version: '0.3.1', exportedAt: new Date().toISOString(), chats: state.chats }, null, 2);
+    const data = JSON.stringify({ app: 'OSAIA AI', version: '0.3.2', exportedAt: new Date().toISOString(), chats: state.chats }, null, 2);
     const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
     const a = document.createElement('a'); a.href = url; a.download = 'OSAIA-AI-conversaciones.json';
     document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
