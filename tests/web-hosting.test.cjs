@@ -9,6 +9,12 @@ test('Render serves the web app, public assets, and API without exposing private
   t.after(() => new Promise(resolve => server.close(resolve)));
   const base = 'http://127.0.0.1:' + server.address().port;
 
+  const tracked = await fetch(base + '/?utm_source=chatgpt.com');
+  assert.equal(tracked.status, 200, 'ChatGPT tracking parameter must not break homepage');
+  assert.match(await tracked.text(), /OSAIA AI/);
+  const trackedHealth = await fetch(base + '/health?utm_source=chatgpt.com');
+  assert.equal(trackedHealth.status, 200, 'health query parameters must be ignored');
+
   const home = await fetch(base + '/');
   assert.equal(home.status, 200);
   assert.match(home.headers.get('content-type'), /text\/html/);
